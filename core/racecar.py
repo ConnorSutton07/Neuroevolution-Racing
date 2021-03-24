@@ -18,7 +18,7 @@ class Racecar:
 				initial_accel: np.ndarray = None
 				) -> None:
 		self.id = id  # this should be base 36 number for uniqueness and to minimize digits
-		self.network = FFNN(architecture, outputAcivation = "linear")  # can decide turning
+		self.network = FFNN(architecture, outputAcivation = "linear")  # can decide steering, acceleration
 		self.initial_p = initial_pos if initial_pos is not None else np.array([0., 0.])  # position
 		self.initial_v = initial_vel if initial_vel is not None else np.array([0., 0.])  # velocity
 		self.initial_a = initial_accel if initial_accel is not None else np.array([0., 0.])  # acceleration
@@ -27,7 +27,7 @@ class Racecar:
 		self.a = self.initial_a.copy()
 		self.steps = 0  # number of steps made
 		self.alive = True
-		self.resets = 0
+		self.resets = 0  # num times this racecar has been reset
 
 	def step(self) -> None:
 		"""Updates cars state."""
@@ -39,9 +39,9 @@ class Racecar:
 		"""Rotates direction ccw by theta degrees in radians, def need to test this."""
 		self.v = np.array([[np.cos(theta), -sin(theta)], [sin(theta), cos(theta)]]) @ self.v
 
-	def get_optimal_state(self, rayLengths: np.ndarray) -> float:
+	def get_optimal_state(self, rayLengths: np.ndarray) -> np.ndarray:
 		"""Gets turn angle from neural network."""
-		return self.network.feedForward(rayLengths)  # turn angle, accel
+		return self.network.feedForward(rayLengths)  # steering angle, acceleartion
 
 	def accelerate(self, a) -> None:
 		"""Sets acceleration."""
