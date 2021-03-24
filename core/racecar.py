@@ -12,7 +12,7 @@ class Racecar:
 	def __init__(
 				self,
 				id: str,
-				architecture: tuple = (8, 6, 3),
+				architecture: tuple = (8, 6, 2),
 				initial_pos: np.ndarray = None,
 				initial_vel: np.ndarray = None,
 				initial_accel: np.ndarray = None
