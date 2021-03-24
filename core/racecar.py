@@ -41,7 +41,7 @@ class Racecar:
 
 	def autostep(self, rayLengths: np.ndarray) -> None:
 		""""Calculates AI controls then takes a step."""
-		steering, throttle = self.get_optimal_state(rayLengths)
+		steering, throttle = self.get_optimal_controls(rayLengths)
 		self.turn(steering)
 		self.accelerate(throttle)
 		self.step()
@@ -53,7 +53,7 @@ class Racecar:
 		sin_d_theta = np.sin(d_theta)
 		self.v = np.array([[cos_d_theta, -sin_d_theta], [sin_d_theta, cos_d_theta]]) @ self.v
 
-	def get_optimal_state(self, rayLengths: np.ndarray) -> np.ndarray:
+	def get_optimal_controls(self, rayLengths: np.ndarray) -> np.ndarray:
 		"""Gets turn angle from neural network."""
 		return self.network.feedForward(rayLengths)  # steering angle, acceleartion
 
@@ -92,6 +92,7 @@ class Racecar:
 			"accel": self.a,
 			"alive": self.alive,
 		}
+
 	def __eq__(self, other: Racecar) -> bool:
 		"""Checks if this racecar and other racecar are equal via id."""
 		return self.id == other.id
