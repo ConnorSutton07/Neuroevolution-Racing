@@ -11,6 +11,7 @@ from scipy.spatial import ConvexHull
 from math import atan2, sqrt
 from core.constants import * 
 import pygame
+from core.graphics import blit_textured_shape
 
 class Track:
     def __init__(self, 
@@ -63,6 +64,7 @@ class Track:
             blit_pos = (point[0] - radius, point[1] - radius)
             track_segment = pygame.Surface(segment_dims, pygame.SRCALPHA)
             pygame.draw.circle(track_segment, self.track_color, (radius, radius), radius)
+            #blit_textured_shape(surface, TRACK_TEXTURE, blit_pos, track_segment)
             surface.blit(track_segment, blit_pos)
         if debug:
             self.DrawPoints(surface, self.original_points, color=LINE_COLOR)
@@ -126,9 +128,6 @@ def shape_track(track_points: np.array,
         track_set[i * 2] = np.ndarray.tolist(track_points[i])
         track_set[i * 2 + 1][0] = int((track_points[i][0] + track_points[(i + 1) % len(track_points)][0]) / 2 + disp_vec[0])
         track_set[i * 2 + 1][1] = int((track_points[i][1] + track_points[(i + 1) % len(track_points)][1]) / 2 + disp_vec[1])
-    #for i in range(3):
-    #    track_set = fix_angles(track_set)
-    #    track_set = push_points_apart(track_set)
 
     final_set = []
     for point in track_set:
@@ -142,67 +141,6 @@ def shape_track(track_points: np.array,
             point[1] = HEIGHT - margin - gauss(margin / 10, 1)
         final_set.append(point)
     return final_set
-
-
-def fix_angles(points: list, max_angle: int = MAX_ANGLE) -> list:
-
-    """
-    Goes through the newly-created points that define the track and 
-    ensures that there no angles between points past a threshold
-    defined by max_angle.
-
-    """
-    prev_point = len(points) - 1
-    for i in range(len(points)):
-        next_point = (i + 1) % len(points)
-        px = points[i][0] - points[prev_point][0]
-        py = points[i][1] - points[prev_point][1]
-        p_dist = sqrt(px**2 + py**2)
-        px /= p_dist
-        py /= p_dist 
-        nx = points[next_point][0] - points[i][0]
-        ny = points[next_point][1] - points[i][1]
-        n_dist = sqrt(nx**2 + ny**2)
-        nx /= n_dist
-        ny /= n_dist 
-        a = atan2(px * ny - py * nx, px * nx + py * ny)
-        if (abs(math.degrees(a)) <= max_angle):
-            continue
-        diff = math.radians(max_angle * math.copysign(1,a)) - a
-        c = math.cos(diff)
-        s = math.sin(diff)
-        new_x = (nx * c - ny * s) * n_dist
-        new_y = (nx * s + ny * c) * n_dist
-        points[next_point][0] = int(points[i][0] + new_x)
-        points[next_point][1] = int(points[i][1] + new_y)
-        prev_point = i
-    return points
-
-def push_points_apart(points: list, min_dist: int = MIN_DISTANCE) -> list:
-
-    """ 
-    Enforces that all points defining the skeleton of the track
-    are at a given minimum distance apart.
-
-    """
-    dst2 = min_dist**2
-    for i in range(len(points)):
-        for j in range(i + 1, len(points)):
-            p_dist = sqrt((points[i][0] - points[j][0])**2 + (points[i][1] - points[j][1])**2)
-            if p_dist < min_dist:
-                dx = points[j][0] - points[i][0];  
-                dy = points[j][1] - points[i][1];  
-                dl = math.sqrt(dx*dx + dy*dy);  
-                dx /= dl;  
-                dy /= dl;  
-                dif = dst2 - dl;  
-                dx *= dif;  
-                dy *= dif;  
-                points[j][0] = int(points[j][0] + dx);  
-                points[j][1] = int(points[j][1] + dy);  
-                points[i][0] = int(points[i][0] - dx);  
-                points[i][1] = int(points[i][1] - dy);  
-    return points
 
 
 def smooth_track(track_points: list) -> list:

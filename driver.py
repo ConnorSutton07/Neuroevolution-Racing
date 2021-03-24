@@ -13,7 +13,7 @@ class Driver():
         self.background = BACKGROUND_COLOR
         self.debug = debug
         self.Track = Track()
-        self.img = pygame.image.load('grass.png')
+        self.img = pygame.image.load('assets/grass.png')
 
     def run(self):
         while True:
@@ -33,6 +33,6 @@ class Driver():
 
     def Draw(self):
         #self.screen.fill(self.background)
-        for y in range(0, 800, 384):
-            for x in range(0, 800, 384):
+        for y in range(0, SIZE[1] + 1, 384):
+            for x in range(0, SIZE[0] + 1, 384):
                 self.screen.blit(self.img, (x, y))
