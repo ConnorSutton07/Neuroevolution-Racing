@@ -2,6 +2,7 @@
 Race car with neural network decision making.
 """
 
+from __future__ import annotations
 import numpy as np
 
 from neural_net import FFNN
@@ -10,13 +11,15 @@ from neural_net import FFNN
 class Racecar:
 	"""Haven't tested any of this yet."""
 	def __init__(
-				self,
-				id: str,
-				architecture: tuple = (8, 6, 2),
-				initial_pos: np.ndarray = None,
-				initial_vel: np.ndarray = None,
-				initial_accel: np.ndarray = None
-				) -> None:
+			self,
+			id: str,
+			architecture: tuple = (8, 6, 2),
+			initial_pos: np.ndarray = None,
+			initial_vel: np.ndarray = None,
+			initial_accel: np.ndarray = None,
+			max_turning_rate: float = np.radians(10),
+			max_acceleration: float = 5,
+			) -> None:
 		self.id = id  # this should be base 36 number for uniqueness and to minimize digits
 		self.network = FFNN(architecture, outputAcivation = "linear")  # can decide steering, acceleration
 		self.initial_p = initial_pos if initial_pos is not None else np.array([0., 0.])  # position
@@ -25,6 +28,8 @@ class Racecar:
 		self.p = self.initial_p.copy()
 		self.v = self.initial_v.copy()
 		self.a = self.initial_a.copy()
+		self.max_turning_rate = max_turning_rate
+		self.max_acceleration = max_acceleration
 		self.steps = 0  # number of steps made
 		self.alive = True
 		self.resets = 0  # num times this racecar has been reset
@@ -35,9 +40,10 @@ class Racecar:
 		self.v += self.a
 		self.steps += 1
 
-	def steer(self, theta: float) -> None:
+	def steer(self, d_theta: float) -> None:
 		"""Rotates direction ccw by theta degrees in radians, def need to test this."""
-		self.v = np.array([[np.cos(theta), -sin(theta)], [sin(theta), cos(theta)]]) @ self.v
+		d_theta = (d_theta / abs(d_theta)) * min(abs(d_theta), self.max_turning_rate)
+		self.v = np.array([[np.cos(d_theta), -sin(d_theta)], [sin(d_theta), cos(d_theta)]]) @ self.v
 
 	def get_optimal_state(self, rayLengths: np.ndarray) -> np.ndarray:
 		"""Gets turn angle from neural network."""
@@ -45,7 +51,7 @@ class Racecar:
 
 	def accelerate(self, a) -> None:
 		"""Sets acceleration."""
-		self.a = a
+		self.a = min(a, self.max_acceleration)
 
 	def is_alive(self) -> bool:
 		"""Returns whether racecar is alive or not."""
@@ -62,7 +68,7 @@ class Racecar:
 		return self.network.getParams()
 
 	def reset(self) -> None:
- 		"""Resets state of this racecar to initial values."""
+		"""Resets state of this racecar to initial values."""
 		self.p = self.initial_p.copy()
 		self.v = self.initial_v.copy()
 		self.a = self.initial_a.copy()
