@@ -60,7 +60,7 @@ class FFNN:
 		"""
 		for w, b in zip(self.weights[:-1], self.biases[:-1]):
 			a = self.activation(a @ w.T + b)
-		return self.activation(a @ self.weights[-1].T + self.biases[-1])
+		return self.outputActivation(a @ self.weights[-1].T + self.biases[-1])
 
 	def get_params(self) -> dict:
 		return {
