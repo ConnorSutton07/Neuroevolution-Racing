@@ -5,23 +5,22 @@ Race car with neural network decision making.
 from __future__ import annotations
 import numpy as np
 
-from neural_net import FFNN
-
+from core.neural_net import FFNN
 
 class Racecar:
 	"""Haven't tested any of this yet."""
 	def __init__(
 			self,
-			id: str,
+			id: str = "",
 			architecture: tuple = (8, 6, 2),
 			initial_pos: np.ndarray = None,
 			initial_vel: np.ndarray = None,
 			initial_accel: np.ndarray = None,
-			max_turning_rate: float = np.radians(10),
+			max_turning_rate: float = np.radians(135),
 			max_acceleration: float = 5,
 			) -> None:
 		self.id = id  # this should be base 36 number for uniqueness and to minimize digits
-		self.network = FFNN(architecture, outputAcivation = "linear")  # can decide steering, acceleration
+		self.network = FFNN(architecture, outputActivation = "linear")  # can decide steering, acceleration
 		self.initial_p = initial_pos if initial_pos is not None else np.array([0., 0.])  # position
 		self.initial_v = initial_vel if initial_vel is not None else np.array([0., 0.])  # velocity
 		self.initial_a = initial_accel if initial_accel is not None else np.array([0., 0.])  # acceleration
@@ -40,10 +39,19 @@ class Racecar:
 		self.v += self.a
 		self.steps += 1
 
-	def steer(self, d_theta: float) -> None:
+	def autostep(self, rayLengths: np.ndarray) -> None:
+		""""Calculates AI controls then takes a step."""
+		steering, throttle = self.get_optimal_state(rayLengths)
+		self.turn(steering)
+		self.accelerate(throttle)
+		self.step()
+
+	def turn(self, d_theta: float) -> None:
 		"""Rotates direction ccw by theta degrees in radians, def need to test this."""
 		d_theta = (d_theta / abs(d_theta)) * min(abs(d_theta), self.max_turning_rate)
-		self.v = np.array([[np.cos(d_theta), -sin(d_theta)], [sin(d_theta), cos(d_theta)]]) @ self.v
+		cos_d_theta = np.cos(d_theta)
+		sin_d_theta = np.sin(d_theta)
+		self.v = np.array([[cos_d_theta, -sin_d_theta], [sin_d_theta, cos_d_theta]]) @ self.v
 
 	def get_optimal_state(self, rayLengths: np.ndarray) -> np.ndarray:
 		"""Gets turn angle from neural network."""
@@ -76,6 +84,14 @@ class Racecar:
 		self.alive = True
 		self.resets += 1
 
+	def get_state(self) -> dict:
+		"""Returns info about racecar's state"""
+		return {
+			"pos": self.p,
+			"vel": self.v,
+			"accel": self.a,
+			"alive": self.alive,
+		}
 	def __eq__(self, other: Racecar) -> bool:
 		"""Checks if this racecar and other racecar are equal via id."""
 		return self.id == other.id
