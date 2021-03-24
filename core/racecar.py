@@ -32,7 +32,7 @@ class Racecar:
 	def step(self) -> None:
 		"""Updates cars state."""
 		self.p += self.v
-		self.v *= self.a
+		self.v += self.a
 		self.steps += 1
 
 	def steer(self, theta: float) -> None:
