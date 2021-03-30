@@ -5,6 +5,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 from core.perlin import *
+from core.transformations import *
 
 class Track:
     def __init__(self,
@@ -38,28 +39,12 @@ class Track:
         left_basic_edge[-1][0] = left_basic_edge[0][0]
         right_basic_edge[-1][0] = right_basic_edge[0][0]
 
+        #basic_euclidean_edges = np.array(to_polar(left_basic_edge), to_polar(right_basic_edge))
         basic_euclidean_edges = np.array([left_basic_edge, right_basic_edge])
 
-        # construct euclidean -> polar edges
-        left_basic_x, left_basic_y = left_basic_edge[:,0], left_basic_edge[:,1]
-        right_basic_x, right_basic_y = right_basic_edge[:,0], right_basic_edge[:,1]
-        
-        left_r = left_basic_x + radius_offset
-        right_r = right_basic_x + radius_offset
-        
-        left_basic_y_min, left_basic_y_max = left_basic_y.min(), left_basic_y.max()
-        right_basic_y_min, right_basic_y_max = right_basic_y.min(), right_basic_y.max()
-        
-        left_theta = (left_basic_y - left_basic_y_min) / (left_basic_y_max - left_basic_y_min) * 2 * np.pi + theta_offset
-        right_theta = (right_basic_y - right_basic_y_min) / (right_basic_y_max - right_basic_y_min) * 2 * np.pi + theta_offset
-        
-        polar_edges = np.array([np.stack([left_r, left_theta], axis=1), np.stack([right_r, right_theta], axis=1)])
-        
-        # construct final transformed polar -> euclidean edges
-        left_x, left_y = left_r * np.cos(left_theta), left_r * np.sin(left_theta)
-        right_x, right_y = right_r * np.cos(right_theta), right_r * np.sin(right_theta)
-        
-        euclidean_edges = np.array([np.stack([left_x, left_y], axis=1), np.stack([right_x, right_y], axis=1)])
+        polar_edges, radii, thetas = to_polar(basic_euclidean_edges, radius_offset, theta_offset)
+        euclidean_edges = to_euclidean(polar_edges, radii, thetas)
+
         return (basic_euclidean_edges, polar_edges, euclidean_edges)
 
 
@@ -67,6 +52,9 @@ class Track:
     def perlin_track(self, octaves: int = 5, amplitude: int = 85) -> tuple:
         left = get_perlin_line(self.density, self.density * self.shape[1], octaves=octaves, amplitude=amplitude)
         right = np.array(list(map(lambda pt: (pt[0] + self.theta_offset, pt[1]), pts)))
+        basic_euclidean_edges = [left, right]
+
+        polar_edges = list(map())
 
         
     def plot(self) -> None:
