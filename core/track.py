@@ -16,12 +16,13 @@ class Track:
             perturbation: callable = lambda i: (i%10) * (10 * np.sin(i)**2),
             type: str = "default",
             ) -> None:
+        self.type = type
         self.shape = shape
         self.point_density = point_density
         self.points_per_edge = shape[1] * point_density
         self.radius_offset = radius_offset
         self.theta_offset = theta_offset
-        if type == "perlin":
+        if self.type == "perlin":
             self.basic_euclidean_edges, self.polar_edges, self.euclidean_edges = self.perlin_track()
         else:
             self.basic_euclidean_edges, self.polar_edges, self.euclidean_edges = self.default_track(perturbation)
@@ -98,7 +99,7 @@ class Track:
             plt.plot(*list(zip(*edge)), c="cyan")
            
         plt.grid(ls="--", alpha=0.25)
-        plt.title("Euclidean") 
+        plt.title("Euclidean - " + self.type) 
 
         plt.xlabel("x")
         plt.ylabel("y")
