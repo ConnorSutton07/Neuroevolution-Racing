@@ -48,13 +48,13 @@ class Track:
 
 
 
-    def perlin_track(self, octaves: int = 5, amplitude: int = 85) -> tuple:
+    def perlin_track(self, octaves: int = 5, amplitude: int = 85, smoothing_factor: int = 20) -> tuple:
         density = self.point_density
         radius_offset = self.radius_offset
         theta_offset = self.theta_offset
         width = self.shape[0]  
         left = get_perlin_line(density, density * self.shape[1], octaves=octaves, amplitude=amplitude)
-        left = smooth(left, self.shape[1], density * 20)
+        left = smooth(left, self.shape[1], density * smoothing_factor)
         right = np.array(list(map(lambda pt: (pt[0] + width, pt[1]), left)))
 
         left[-1][0] = left[0][0]
