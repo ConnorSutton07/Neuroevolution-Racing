@@ -4,8 +4,8 @@
 
 from matplotlib import pyplot as plt
 import numpy as np
-from core.perlin import *
-from core.transformations import *
+from core.track_generation.perlin import *
+from core.track_generation.transformations import *
 
 class Track:
     def __init__(self,
@@ -14,7 +14,7 @@ class Track:
             radius_offset: float = 10,
             theta_offset: float = 50,
             perturbation: callable = lambda i: (i%10) * (10 * np.sin(i)**2),
-            type: str = "perlin",
+            type: str = "default",
             ) -> None:
         self.shape = shape
         self.point_density = point_density
@@ -50,8 +50,8 @@ class Track:
 
     def perlin_track(self, octaves: int = 5, amplitude: int = 85, smoothing_factor: int = 20) -> tuple:
         density = self.point_density
-        radius_offset = self.radius_offset
-        theta_offset = self.theta_offset
+        radius_offset = 75
+        theta_offset = 0
         width = self.shape[0]  
         left = get_perlin_line(density, density * self.shape[1], octaves=octaves, amplitude=amplitude)
         left = smooth(left, self.shape[1], density * smoothing_factor)
@@ -61,7 +61,7 @@ class Track:
         right[-1][0] = right[0][0]
         basic_euclidean_edges = np.array([left, right])
 
-        polar_edges, radii, thetas = to_polar(basic_euclidean_edges, 75, 0)
+        polar_edges, radii, thetas = to_polar(basic_euclidean_edges, radius_offset, theta_offset)
         euclidean_edges = to_euclidean(polar_edges, radii, thetas)
 
         return (basic_euclidean_edges, polar_edges, euclidean_edges)
@@ -106,6 +106,6 @@ class Track:
         plt.show()
        
 if __name__ == "__main__":      
-    track = Track()
+    track = Track(type="perlin")
     track.plot() 
            
