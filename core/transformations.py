@@ -3,7 +3,7 @@ import numpy as np
 def to_polar(euclidean_edges: np.array, radius_offset: float, theta_offset: float) -> tuple:
     """
     Requires an array containing left and right euclidean edges as well
-    as the radius and theta offsets;
+    as the radius and theta offsets.
     Returns the polar edges along with the radii of the two lines and their theta values
 
     """
@@ -30,6 +30,10 @@ def to_polar(euclidean_edges: np.array, radius_offset: float, theta_offset: floa
 
 def to_euclidean(polar_edges: np.array, radii: list, thetas: list) -> np.array:
     """
+    Requries an array of left and right polar edges as well as 
+    radius and theta offsets.
+    Returns the euclidean edges as well as the radii of the two lines and their 
+    theta values.
 
     """
     left_r = radii[0]
