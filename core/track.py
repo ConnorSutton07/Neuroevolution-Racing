@@ -14,17 +14,17 @@ class Track:
             radius_offset: float = 10,
             theta_offset: float = 50,
             perturbation: callable = lambda i: (i%10) * (10 * np.sin(i)**2),
-            type: str = "default",
+            type: str = "perlin",
             ) -> None:
         self.shape = shape
         self.point_density = point_density
         self.points_per_edge = shape[1] * point_density
         self.radius_offset = radius_offset
         self.theta_offset = theta_offset
-        #if self.type == "perlin":
-
-        #else:
-        self.basic_euclidean_edges, self.polar_edges, self.euclidean_edges = self.default_track(perturbation)
+        if type == "perlin":
+            self.basic_euclidean_edges, self.polar_edges, self.euclidean_edges = self.perlin_track()
+        else:
+            self.basic_euclidean_edges, self.polar_edges, self.euclidean_edges = self.default_track(perturbation)
 
         
 
@@ -39,7 +39,6 @@ class Track:
         left_basic_edge[-1][0] = left_basic_edge[0][0]
         right_basic_edge[-1][0] = right_basic_edge[0][0]
 
-        #basic_euclidean_edges = np.array(to_polar(left_basic_edge), to_polar(right_basic_edge))
         basic_euclidean_edges = np.array([left_basic_edge, right_basic_edge])
 
         polar_edges, radii, thetas = to_polar(basic_euclidean_edges, radius_offset, theta_offset)
@@ -50,11 +49,22 @@ class Track:
 
 
     def perlin_track(self, octaves: int = 5, amplitude: int = 85) -> tuple:
-        left = get_perlin_line(self.density, self.density * self.shape[1], octaves=octaves, amplitude=amplitude)
-        right = np.array(list(map(lambda pt: (pt[0] + self.theta_offset, pt[1]), pts)))
-        basic_euclidean_edges = [left, right]
+        density = self.point_density
+        radius_offset = self.radius_offset
+        theta_offset = self.theta_offset
+        width = self.shape[0]  
+        left = get_perlin_line(density, density * self.shape[1], octaves=octaves, amplitude=amplitude)
+        left = smooth(left, self.shape[1], density * 20)
+        right = np.array(list(map(lambda pt: (pt[0] + width, pt[1]), left)))
 
-        polar_edges = list(map())
+        left[-1][0] = left[0][0]
+        right[-1][0] = right[0][0]
+        basic_euclidean_edges = np.array([left, right])
+
+        polar_edges, radii, thetas = to_polar(basic_euclidean_edges, 75, 0)
+        euclidean_edges = to_euclidean(polar_edges, radii, thetas)
+
+        return (basic_euclidean_edges, polar_edges, euclidean_edges)
 
         
     def plot(self) -> None:
