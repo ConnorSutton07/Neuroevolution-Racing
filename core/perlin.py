@@ -1,4 +1,6 @@
 from perlin_noise import PerlinNoise
+import numpy as np
+from scipy.interpolate import interp1d
 
 def get_perlin_line(density: int, num_points: int, octaves: int = 4, amplitude: int = 75) -> np.array:
     """
@@ -43,3 +45,14 @@ def get_wild_line(density: int, num_points: int, amplitude: int = 75) -> np.arra
         pts[i] = np.array([0 + noise_val, i / density])
 
     return pts
+
+def smooth(pts: np.array, height: int, density: int) -> np.array:
+    """
+    1-D cubic interpolation
+
+    """
+    pts = pts.T 
+    cubic_interpolation = interp1d(pts[1], pts[0], kind='cubic', fill_value="extrapolate")
+    new_y = np.linspace(0, height, density)
+    new_x = cubic_interpolation(new_y)
+    return np.array([new_x, new_y]).T
