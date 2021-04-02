@@ -1,6 +1,7 @@
 import sys
 from core.ui import ui
 from core import settings
+from core import game
 #from core.track import Track
 #from core.engine import Engine
 
@@ -27,8 +28,7 @@ class Driver():
         ui.runModes(modes)
 
     def _playerVsAI(self) -> None:
-        print("Not implemented!")
-        sys.exit()
+        game.PvAI()
 
     def _playAI(self) -> None:
         print("Not implemented!")

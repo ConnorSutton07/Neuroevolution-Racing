@@ -1,4 +1,4 @@
-  """
+"""
 Pygame wrapper allowing for easy, convenient, and customizable GUI windows.
 Classes
 -------
@@ -35,6 +35,8 @@ class Engine:
         Background for active window
     screen: pygame.Surface
         Background for entire screen
+    screenSize: tuple
+        (width, height) of the screen
     offset: tuple
         (x, y) offset for position of active window relative to screen
     Public Methods
@@ -129,6 +131,7 @@ class Engine:
             backgroundSize = (numGrids[0] * compression, numGrids[1] * compression)
             self.offset = (0.5 * (screenSize[0] - backgroundSize[0]), 0)
 
+        self.screenSize = screenSize
         self.screen = pygame.display.set_mode(screenSize)
         self.surfaceCache[backgroundSize] = pygame.Surface(backgroundSize)
         self.background = self.surfaceCache[backgroundSize]
@@ -297,6 +300,30 @@ class Engine:
         """
         pygame.draw.line(self.screen, fillColor, start, end, width)
 
+    def renderPolygon(self, pos: tuple, points: list, surface = None, closed: bool = False) -> None:
+        """
+        Draws polygon to given surface
+
+        Parameters
+        ----------
+        surface
+            Surface to draw on (defaults to engine.screen)
+        pos: tuple
+            (x, y) pos for start of drawing
+        points: list
+            list of (x, y) pairs of points to connect
+        closed: bool
+            Indicates that the first and last points in the list should be connected
+        
+        """
+        if surface is None:
+            surface = self.screen
+        pygame.draw.polygon(surface, pos, points, closed=closed)
+
+
+    #def applyTexture(self, texture_path: str, surface: Engine.Surface = self.screen) -> Engine.Surface:
+    #    texture = pygame.image.load(texture_path, )
+
     def _handleEvents(self) -> None:
         """Handles events from Pygame's event queue. pygame.QUIT occurs when "X" on top right corner is clicked."""
         for event in pygame.event.get():
@@ -336,23 +363,43 @@ class Engine:
                     board[(i, j)] = 0
         return board
 
-
-    def load_image(self, path: str) -> Image:
-        """
-        Load image from file source
-        """
-        return pygame.image.load(path)
-
-    def surface_union(s1: Engine.Surface, s2: Engine.Surface) -> Engine.Surface:
-        
-
     #def tile_texure(self, texture, size: tuple) -> Surface:
 
-    class Surface:
-        def __init__(self, size: tuple): -> Surface:
-            self.surface = pygame.Surface(size)
+    def tile_texture(self, texture, size: tuple):
+        result = Engine.Surface(size, depth=32)
+        for x in range(0, size[0], texture.get_width()):
+            for y in range(0, size[1], texture.get_height()):
+                result.blit(texture, (x, y))
+        return result
 
-        def blit(source: Surface, dest: tuple, area=None, special_flags: str = 0) -> None:
-            self.surface.blit(source, dest, area=area, special_flags=special_flags)
+    def tileImageAsBackground(self, img_path: str):
+        img = pygame.image.load(img_path)
+        for x in range(0, self.screenSize[0], img.get_width()):
+            for y in range(0, self.screenSize[1], img.get_height()):
+                self.screen.blit(img, (x, y))
+
+
+    class Surface:
+        def __init__(self, size: tuple, flag: str, depth:int = 0):
+            if (flag == "srcalpha"):
+                self.surface = pygame.Surface(size, pygame.SRCALPHA, depth=depth)
+            else:
+                self.surface = pygame.Surface(size, depth=depth)
+
+        def blit(self, source, dest: tuple, area=None, flag: str = 0) -> None:
+            self.surface.blit(source, dest, area=area, flag=flag)
+
+        def erase(self, innerMask):
+            outer_mask = pygame.mask.from_surface(self.surface)
+            inner_mask = pygame.mask.from_surface(innerMask)
+            outer_mask.erase(self.inner_mask, (0, 0))
+            return outer_mask.to_surface(setcolor=(255, 255, 255, 255), unsetcolor=(0,0,0,0))
+
+    class Image:
+        def __init__(self, path: str):
+            self.image = pygame.image.load(path)
+
+
+        
 
 
