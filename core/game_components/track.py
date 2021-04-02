@@ -3,14 +3,13 @@
 """
 from matplotlib import pyplot as plt
 import numpy as np
-from core.track_generation.perlin import *
-from core.track_generation.transformations import *
+from core.game_components.track_generation.perlin import *
+from core.game_components.track_generation.transformations import *
+import random
 
 
 class Track:
     def __init__(self,
-            origin: tuple,
-            size: tuple,
             type: str = "default",
             shape: tuple = (30, 10),
             point_density: int = 5,
@@ -75,8 +74,9 @@ class Track:
 
 
     def perlin_track(self, octaves: int = 5, amplitude: int = 85, smoothing_factor: int = 30) -> tuple:
-        density = self.point_density
-        radius_offset = 75
+        amplitude = amplitude + random.randint(-5, 5)
+        density = self.point_density 
+        radius_offset = 125 + random.randint(-30, 30)
         theta_offset = 0
         width = self.shape[0]  
         left = get_perlin_line(density, density * self.shape[1], octaves=octaves, amplitude=amplitude)

@@ -336,8 +336,6 @@ class Engine:
                     board[(i, j)] = 0
         return board
 
-    #def renderTrack(self, outer_edges: np.array, inner_edges: np.array):
-
 
     def load_image(self, path: str) -> Image:
         """
@@ -345,5 +343,16 @@ class Engine:
         """
         return pygame.image.load(path)
 
-    def tile_texure(self, texture, size: tuple) -> Surface:
+    def surface_union(s1: Engine.Surface, s2: Engine.Surface) -> Engine.Surface:
+        
+
+    #def tile_texure(self, texture, size: tuple) -> Surface:
+
+    class Surface:
+        def __init__(self, size: tuple): -> Surface:
+            self.surface = pygame.Surface(size)
+
+        def blit(source: Surface, dest: tuple, area=None, special_flags: str = 0) -> None:
+            self.surface.blit(source, dest, area=area, special_flags=special_flags)
+
 
