@@ -46,3 +46,12 @@ def to_euclidean(polar_edges: np.array, radii: list, thetas: list) -> np.array:
 
     euclidean_edges = np.array([np.stack([left_x, left_y], axis=1), np.stack([right_x, right_y], axis=1)])
     return euclidean_edges
+
+def recenter(edges: np.array, origin: tuple):
+    """
+    Recenters all points around new origin
+
+    """
+    for edge in edges:
+        edge = np.array(list(map(lambda pt: (pt[0] + origin[0], pt[1] + origin[1]), edge)))
+    return edges

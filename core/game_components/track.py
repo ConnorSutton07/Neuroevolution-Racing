@@ -50,8 +50,6 @@ class Track:
 
         """
         return self.euclidean_edges[1]
-    
-        
 
     def default_track(self, perturbation: callable) -> tuple:
         # construct initial euclidean edges
