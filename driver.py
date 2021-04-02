@@ -1,38 +1,50 @@
-import pygame
-from pygame.locals import *
 import sys
-from core.racetrack import Track
-from core.constants import BACKGROUND_COLOR, SIZE
-
-pygame.init()
+from core.ui import ui
+from core import settings
+#from core.track import Track
+#from core.engine import Engine
 
 class Driver():
-    def __init__(self, debug: bool = False):
-        self.screen_res = SIZE[0], SIZE[1]
-        self.screen = pygame.display.set_mode(self.screen_res, pygame.RESIZABLE)
-        self.background = BACKGROUND_COLOR
+    def __init__(self, debug: bool = False) -> None:
         self.debug = debug
-        self.Track = Track()
-        self.img = pygame.image.load('assets/grass.png')
+        #self.engine = Engine()
+        #self.Track = Track()#type="perlin")
+        #self.Track.plot()
+        print()
+        print("     +" + "-"*21 + "+")
+        print("      NEUROEVOLUTION RACING")
+        print("     +" + "-"*21 + "+")
+        print()
 
-    def run(self):
-        while True:
-            self.Loop()
+    def run(self) -> None:
+        modes = [
+                ("Player vs AI", self._playerVsAI),
+                ("AI Battle", self._playAI),
+                ("Evolve AI", self._evolveAI),
+                ("Exit", lambda: sys.exit())
+        ]
 
-    def Loop(self):
-        self.EventLoop()
-        self.Draw()
-        self.Track.Draw(self.screen, self.debug)
-        pygame.display.update()
+        ui.runModes(modes)
 
-    def EventLoop(self):
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
+    def _playerVsAI(self) -> None:
+        print("Not implemented!")
+        sys.exit()
 
-    def Draw(self):
-        #self.screen.fill(self.background)
-        for y in range(0, SIZE[1] + 1, 384):
-            for x in range(0, SIZE[0] + 1, 384):
-                self.screen.blit(self.img, (x, y))
+    def _playAI(self) -> None:
+        print("Not implemented!")
+        sys.exit()
+
+    def _evolveAI(self) -> None:
+        print("not implemented")
+        sys.exit()
+
+    # def run(self) -> None:
+    #     while True:
+    #         for object in self.gameObjects:
+    #             track_edges = self.Track.getTrack()
+    #             left_edges = track_edges[0]
+    #             right_edges = track_edges[1]
+    #             self.engine.renderLines(left_edges, 10)
+    #             self.engine.renderLines(right_edges, 10)
+
+

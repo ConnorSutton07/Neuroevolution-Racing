@@ -1,20 +1,22 @@
 """
 
 """
-
 from matplotlib import pyplot as plt
 import numpy as np
 from core.track_generation.perlin import *
 from core.track_generation.transformations import *
 
+
 class Track:
     def __init__(self,
-            shape: tuple = (20, 10),
+            origin: tuple,
+            size: tuple,
+            type: str = "default",
+            shape: tuple = (30, 10),
             point_density: int = 5,
             radius_offset: float = 10,
             theta_offset: float = 50,
-            perturbation: callable = lambda i: (i%10) * (10 * np.sin(i)**2),
-            type: str = "default",
+            perturbation: callable = lambda i: (i%10) * (10 * np.sin(i)**2)
             ) -> None:
         self.type = type
         self.shape = shape
@@ -27,6 +29,29 @@ class Track:
         else:
             self.basic_euclidean_edges, self.polar_edges, self.euclidean_edges = self.default_track(perturbation)
 
+       # self.plot()
+
+    def getTrackEdges(self) -> np.array:
+        """
+        Returns the final euclidean form of the generated racetrack
+
+        """
+        return self.euclidean_edges
+
+    def getInnerEdges(self) -> np.array:
+        """
+        Returns the inside edges of the final euclidean track
+
+        """
+        return self.euclidean_edges[0]
+
+    def getOuterEdges(self) -> np.array:
+        """
+        Returns the outside edges of the final euclidean track
+
+        """
+        return self.euclidean_edges[1]
+    
         
 
     def default_track(self, perturbation: callable) -> tuple:
@@ -49,7 +74,7 @@ class Track:
 
 
 
-    def perlin_track(self, octaves: int = 5, amplitude: int = 85, smoothing_factor: int = 20) -> tuple:
+    def perlin_track(self, octaves: int = 5, amplitude: int = 85, smoothing_factor: int = 30) -> tuple:
         density = self.point_density
         radius_offset = 75
         theta_offset = 0
