@@ -21,6 +21,7 @@ SMOOTHNESS = 3  # controls how fast and smooth animations run
 TRACK_TYPE = "perlin"
 TRACK_SIZE = (300, 300)
 TRACK_ORIGIN = (400, 300)
+TRACK_SCALE = 1.5
 
 # ASSET PATHS
 BACKGROUND = 'assets/grass.png'
