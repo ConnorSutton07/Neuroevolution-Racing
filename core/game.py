@@ -26,7 +26,7 @@ def PvAI():
 def _renderEnvironment(engine: Engine, environment: Environment):
     track = environment.track
 
-    engine.tileImageAsBackground("assets/grass.png")
+    engine.tileImageAsBackground("grass.png")
     texture = engine.Image("assets/texture.png")
     texture = engine.tile_texture(texture)
     inner_edges = track.getInnerEdges()

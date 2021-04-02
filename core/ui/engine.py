@@ -6,6 +6,8 @@ Engine
     Used to render window and blit shapes and text to screen.
 """
 
+from __future__ import annotations
+import os
 import pygame
 from copy import deepcopy
 
@@ -81,7 +83,8 @@ class Engine:
                  targetFPS: int = 60,
                  title: str = "Untitled Game",
                  fontStyle: str = "impact",
-                 gridColors: tuple = ("black", "white", "black")
+                 gridColors: tuple = ("black", "white", "black"),
+                 imageFolder: str = "images"
                  ) -> None:
         """
         Initializes engine, calculates aspect ratio and fits active window to screen.
@@ -115,6 +118,9 @@ class Engine:
 
         self.fontCache = {}
         self.surfaceCache = {}
+        self.imageCache = {}
+        
+        self.imagePath = os.path.join(os.getcwd(), imagePath)
 
         # aspect ratios
         screenAR, gridsAR = screenSize[0]/screenSize[1], numGrids[0]/numGrids[1]
@@ -380,8 +386,10 @@ class Engine:
                 result.blit(img, (x, y))
         return result
 
-    def tileImageAsBackground(self, img_path: str):
-        img = pygame.image.load(img_path)
+    def tileImageAsBackground(self, img_name: str):
+        if img_name not in self.imgageCache:
+            self.imacheCache[img_name] = pygame.image.load(self.imagePath + img_name)
+        img = self.imacheCache[img_name]
         for x in range(0, self.screenSize[0], img.get_width()):
             for y in range(0, self.screenSize[1], img.get_height()):
                 self.screen.blit(img, (x, y))
