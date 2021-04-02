@@ -7,6 +7,7 @@ Engine
 """
 
 import pygame
+from copy import deepcopy
 
 __author__ = "Grant Holmes"
 __email__ = "g.holmes429@gmail.com"
@@ -300,7 +301,7 @@ class Engine:
         """
         pygame.draw.line(self.screen, fillColor, start, end, width)
 
-    def renderPolygon(self, pos: tuple, points: list, surface = None, closed: bool = False) -> None:
+    def renderPolygon(self, color: tuple, points: list, surface = None) -> None:
         """
         Draws polygon to given surface
 
@@ -317,8 +318,13 @@ class Engine:
         
         """
         if surface is None:
-            surface = self.screen
-        pygame.draw.polygon(surface, pos, points, closed=closed)
+            pygame.draw.polygon(self.screen, color, points)
+        else:
+            pygame.draw.polygon(surface.surface, color, points)
+
+
+    def renderSurface(self, source, dest: tuple = (0,0), area=None, flag: str = 0) -> None:
+            self.screen.blit(source, dest, area=area, special_flags=flag)
 
 
     #def applyTexture(self, texture_path: str, surface: Engine.Surface = self.screen) -> Engine.Surface:
@@ -363,13 +369,15 @@ class Engine:
                     board[(i, j)] = 0
         return board
 
-    #def tile_texure(self, texture, size: tuple) -> Surface:
 
-    def tile_texture(self, texture, size: tuple):
-        result = Engine.Surface(size, depth=32)
-        for x in range(0, size[0], texture.get_width()):
-            for y in range(0, size[1], texture.get_height()):
-                result.blit(texture, (x, y))
+    def tile_texture(self, texture, size: tuple = None):
+        if size is None:
+            size = self.screenSize
+        img = texture.image
+        result = Engine.Surface(size, flag="srcalpha", depth=32)
+        for x in range(0, size[0], img.get_width()):
+            for y in range(0, size[1], img.get_height()):
+                result.blit(img, (x, y))
         return result
 
     def tileImageAsBackground(self, img_path: str):
@@ -380,20 +388,43 @@ class Engine:
 
 
     class Surface:
-        def __init__(self, size: tuple, flag: str, depth:int = 0):
+        def __init__(self, size: tuple, flag: str = None, depth: int = 0):
             if (flag == "srcalpha"):
-                self.surface = pygame.Surface(size, pygame.SRCALPHA, depth=depth)
+                self.surface = pygame.Surface(size, pygame.SRCALPHA)
             else:
                 self.surface = pygame.Surface(size, depth=depth)
 
         def blit(self, source, dest: tuple, area=None, flag: str = 0) -> None:
-            self.surface.blit(source, dest, area=area, flag=flag)
+            self.surface.blit(source, dest, area=area, special_flags=flag)
 
-        def erase(self, innerMask):
+        def convert_alpha(self) -> None:
+            self.surface.convert_alpha()
+
+        def erase(self, innerSurface):
             outer_mask = pygame.mask.from_surface(self.surface)
-            inner_mask = pygame.mask.from_surface(innerMask)
-            outer_mask.erase(self.inner_mask, (0, 0))
-            return outer_mask.to_surface(setcolor=(255, 255, 255, 255), unsetcolor=(0,0,0,0))
+            inner_mask = pygame.mask.from_surface(innerSurface.surface)
+            outer_mask.erase(inner_mask, (0, 0))
+            outer_surface = outer_mask.to_surface(setcolor=(255, 255, 255, 255), unsetcolor=(0,0,0,0))
+            new_surface = Engine.Surface(outer_surface.get_size(), flag="srcalpha")
+            new_surface.surface = outer_surface.copy()
+            return new_surface
+
+        def apply_texture(self, texture):
+            """
+            Image should be  a 24 or 32bit image,
+            mask should be an 8 bit image with the alpha
+            channel to be applied
+            
+            """
+            texture.convert_alpha()
+            target = pygame.surfarray.pixels_alpha(texture.surface)
+            target[:] = pygame.surfarray.array2d(self.surface)
+            # surfarray objets usually lock the Surface. 
+            # it is a good idea to dispose of them explicitly
+            # as soon as the work is done.
+            del target
+            return texture
+
 
     class Image:
         def __init__(self, path: str):
