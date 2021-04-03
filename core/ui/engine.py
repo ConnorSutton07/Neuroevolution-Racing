@@ -336,6 +336,9 @@ class Engine:
     #def applyTexture(self, texture_path: str, surface: Engine.Surface = self.screen) -> Engine.Surface:
     #    texture = pygame.image.load(texture_path, )
 
+    def cacheSurface(self, name, surface):
+        self.surfaceCache[name] = surface
+
     def _handleEvents(self) -> None:
         """Handles events from Pygame's event queue. pygame.QUIT occurs when "X" on top right corner is clicked."""
         for event in pygame.event.get():
@@ -409,6 +412,7 @@ class Engine:
             self.surface.convert_alpha()
             
         def invert(self):
+            """Not operation relative to universe"""
             mask = pygame.mask.from_surface(self.surface)
             mask.invert()
             surface = mask.to_surface(setcolor=(255, 255, 255, 255), unsetcolor=(0,0,0,0))
@@ -417,6 +421,7 @@ class Engine:
             return new_surface
             
         def union(self, surface):
+            """Union of two masks"""
             mask = pygame.mask.from_surface(self.surface)
             other_mask = pygame.mask.from_surface(innerSurface.surface)
             union = other_mask.draw(surface)
@@ -426,6 +431,7 @@ class Engine:
             return new_surface
             
         def intersection(self, surface):
+            """Intersection of two masks"""
             mask = pygame.mask.from_surface(self.surface)
             other_mask = pygame.mask.from_surface(innerSurface.surface)
             intersection = other_mask.overlap_mask(surface)
@@ -435,6 +441,7 @@ class Engine:
             return new_surface
             
         def difference(self, surface):
+            """Difference of two masks"""
             outer_mask = pygame.mask.from_surface(self.surface)
             inner_mask = pygame.mask.from_surface(surface.surface)
             outer_mask.erase(inner_mask, (0, 0))
@@ -444,15 +451,19 @@ class Engine:
             return new_surface
             
         def __and__(self, surface):
+            """Ex. surface1 & surface2"""
             return self.intersection(surface)
             
         def __or__(self, surface):
+            """Ex. surface1 | surface2"""
             return self.union(surface)
             
         def __sub__(self, surface):
+            """Ex. surface1 - surface2"""
             return self.difference(surface)
             
         def __NE__(self):
+            """Ex. !surface1"""
             return self.invert()
 
         def apply_texture(self, texture):
