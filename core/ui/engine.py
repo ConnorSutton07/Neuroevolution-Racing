@@ -121,7 +121,6 @@ class Engine:
         self.imageCache = {}
         
         self.imageFolder = os.path.join(os.getcwd(), imageFolder)
-        print(self.imageFolder)
 
         # aspect ratios
         screenAR, gridsAR = screenSize[0]/screenSize[1], numGrids[0]/numGrids[1]
@@ -408,15 +407,53 @@ class Engine:
 
         def convert_alpha(self) -> None:
             self.surface.convert_alpha()
-
-        def erase(self, innerSurface):
+            
+        def invert(self):
+            mask = pygame.mask.from_surface(self.surface)
+            mask.invert()
+            surface = mask.to_surface(setcolor=(255, 255, 255, 255), unsetcolor=(0,0,0,0))
+            new_surface = Engine.Surface(surface.get_size(), flag="srcalpha")
+            new_surface.surface = surface.copy()
+            return new_surface
+            
+        def union(self, surface):
+            mask = pygame.mask.from_surface(self.surface)
+            other_mask = pygame.mask.from_surface(innerSurface.surface)
+            union = other_mask.draw(surface)
+            surface = union.to_surface(setcolor=(255, 255, 255, 255), unsetcolor=(0,0,0,0))
+            new_surface = Engine.Surface(surface.get_size(), flag="srcalpha")
+            new_surface.surface = surface.copy()
+            return new_surface
+            
+        def intersection(self, surface):
+            mask = pygame.mask.from_surface(self.surface)
+            other_mask = pygame.mask.from_surface(innerSurface.surface)
+            intersection = other_mask.overlap_mask(surface)
+            surface = intersection.to_surface(setcolor=(255, 255, 255, 255), unsetcolor=(0,0,0,0))
+            new_surface = Engine.Surface(surface.get_size(), flag="srcalpha")
+            new_surface.surface = surface.copy()
+            return new_surface
+            
+        def difference(self, surface):
             outer_mask = pygame.mask.from_surface(self.surface)
-            inner_mask = pygame.mask.from_surface(innerSurface.surface)
+            inner_mask = pygame.mask.from_surface(surface.surface)
             outer_mask.erase(inner_mask, (0, 0))
             outer_surface = outer_mask.to_surface(setcolor=(255, 255, 255, 255), unsetcolor=(0,0,0,0))
             new_surface = Engine.Surface(outer_surface.get_size(), flag="srcalpha")
             new_surface.surface = outer_surface.copy()
             return new_surface
+            
+        def __and__(self, surface):
+            return self.intersection(surface)
+            
+        def __or__(self, surface):
+            return self.union(surface)
+            
+        def __sub__(self, surface):
+            return self.difference(surface)
+            
+        def __NE__(self):
+            return self.invert()
 
         def apply_texture(self, texture):
             """

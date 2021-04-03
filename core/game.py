@@ -44,7 +44,7 @@ def _renderEnvironment(engine: Engine, environment: Environment):
     engine.renderPolygon((255, 255, 255), outer_edges, outer_surface)
     engine.renderPolygon((0, 0, 0), inner_edges, inner_surface)
 
-    outer_surface = outer_surface.erase(inner_surface).apply_texture(texture)
+    outer_surface = (outer_surface - inner_surface).apply_texture(texture)
     engine.renderSurface(outer_surface.surface)
 
 
