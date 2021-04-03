@@ -120,7 +120,8 @@ class Engine:
         self.surfaceCache = {}
         self.imageCache = {}
         
-        self.imagePath = os.path.join(os.getcwd(), imagePath)
+        self.imageFolder = os.path.join(os.getcwd(), imageFolder)
+        print(self.imageFolder)
 
         # aspect ratios
         screenAR, gridsAR = screenSize[0]/screenSize[1], numGrids[0]/numGrids[1]
@@ -387,9 +388,9 @@ class Engine:
         return result
 
     def tileImageAsBackground(self, img_name: str):
-        if img_name not in self.imgageCache:
-            self.imacheCache[img_name] = pygame.image.load(self.imagePath + img_name)
-        img = self.imacheCache[img_name]
+        if img_name not in self.imageCache:
+            self.imageCache[img_name] = pygame.image.load(os.path.join(self.imageFolder, img_name))
+        img = self.imageCache[img_name]
         for x in range(0, self.screenSize[0], img.get_width()):
             for y in range(0, self.screenSize[1], img.get_height()):
                 self.screen.blit(img, (x, y))

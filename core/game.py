@@ -1,6 +1,8 @@
 """
 
 """
+import os
+
 from core.game_components.track import Track
 from core.game_components.environment import Environment
 from core.settings import *
@@ -9,7 +11,7 @@ import keyboard
 
 def PvAI():
     track = Track(type=TRACK_TYPE)
-    engine = Engine(SCREEN_SIZE, (1, 1), checkered=False)
+    engine = Engine(SCREEN_SIZE, (1, 1), checkered=False, imageFolder=os.path.join(os.getcwd(), "assets"))
     environment = Environment(track)
 
     while not keyboard.is_pressed('esc'):
