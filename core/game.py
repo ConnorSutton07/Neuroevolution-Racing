@@ -29,8 +29,9 @@ def _renderEnvironment(engine: Engine, environment: Environment):
     track = environment.track
 
     engine.tileImageAsBackground("grass.png")
-    texture = engine.Image("assets/texture.png")
-    texture = engine.tile_texture(texture)
+    #texture = engine.Image("texture2.png")
+    texture = engine.load_image("texture2.png")
+    texture = engine.tile_surface(texture)
     inner_edges = track.getInnerEdges()
     outer_edges = track.getOuterEdges()
 
