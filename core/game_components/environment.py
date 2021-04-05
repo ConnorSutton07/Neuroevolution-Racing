@@ -31,8 +31,10 @@ class Environment:
         Determines whether a given point resides inside the track
 
         """ 
-
-        pt = (pt[0] / TRACK_SCALE - TRACK_ORIGIN[0], pt[1] / TRACK_SCALE - TRACK_ORIGIN[1])
+        #print(TRACK_ORIGIN)
+        #pt = (pt[0] / TRACK_SCALE - TRACK_ORIGIN[0], pt[1] / TRACK_SCALE - TRACK_ORIGIN[1])
+        pt = ((pt[0] - TRACK_ORIGIN[0]) / TRACK_SCALE, (pt[1] - TRACK_ORIGIN[1]) / TRACK_SCALE)
+        #pt = (pt[0] / TRACK_SCALE, pt[1] / TRACK_SCALE)
         return self.track.contains(pt)
 
 

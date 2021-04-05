@@ -108,8 +108,10 @@ class Track:
 
         try:
             left_r = self.lerp(theta)
-            print("Radius at", theta, ":", left_r, "-", left_r + self.shape[0])
-            right_r = r + self.shape[0]
+            #print("Radius at", theta, ":", left_r, "-", left_r + self.shape[0])
+            #right_r = r + self.shape[0]
+            right_r = left_r + self.shape[0]
+            #if (r >= left_r):
             if (r >= left_r and r <= right_r):
                 return True
             else:

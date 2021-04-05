@@ -49,8 +49,8 @@ def PvAI():
     track_surface = prepareTrackSurface(engine, environment)
 
     pts = []
-    for i in range(100):
-        pt = (randint(-200, 200) + TRACK_ORIGIN[0], randint(-200, 200) + TRACK_ORIGIN[1])
+    for i in range(3000):
+        pt = (randint(-300, 300) + TRACK_ORIGIN[0], randint(-300, 300) + TRACK_ORIGIN[1])
         pts.append(pt)
 
     while not keyboard.is_pressed('esc'):
@@ -75,10 +75,11 @@ def _renderEnvironment(engine: Engine, environment: Environment, track_surface: 
 
 
     for pt in pts:
+        pt2 = (pt[0] - 2.5, pt[1] - 2.5)
         if environment.trackContains(pt):
-            engine.renderCircle(pt, 10, (0, 255, 0))
+            engine.renderCircle(pt2, 5, (0, 255, 0))
         else:
-            engine.renderCircle(pt, 10, (255, 0, 0))
+            engine.renderCircle(pt2, 5, (255, 0, 0))
    # pt = (400, 400)
 
 
