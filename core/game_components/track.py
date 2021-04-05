@@ -51,6 +51,14 @@ class Track:
         """
         return self.euclidean_edges[1]
 
+    def setFinalEuclidean(self, new_edges: np.array) -> None:
+        """
+        Replaces the track's euclidean edges with an updated version
+
+        """
+
+        self.euclidean_edges = new_edges
+
     def default_track(self, perturbation: callable) -> tuple:
         # construct initial euclidean edges
         point_density = self.point_density
