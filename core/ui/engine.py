@@ -140,7 +140,8 @@ class Engine:
 
         self.screenSize = screenSize
         self.screen = pygame.display.set_mode(screenSize)
-        self.surfaceCache[backgroundSize] = pygame.Surface(backgroundSize)
+        #self.surfaceCache[backgroundSize] = pygame.Surface(backgroundSize)
+        self.surfaceCache[backgroundSize] = Engine.Surface(backgroundSize, flag="srcalpha")
         self.background = self.surfaceCache[backgroundSize]
 
         self.gridSize = tuple([int(backgroundSize[0] / numGrids[0]), int(backgroundSize[1] / numGrids[1])])
@@ -154,7 +155,8 @@ class Engine:
         # create checkered background
         if checkered:
             for coord, val in Engine.checkerboard(numGrids).items():
-                rect = pygame.Surface(self.gridSize)
+                #rect = pygame.Surface(self.gridSize)
+                rect = Engine.Surface(self.gridSize)
                 rect.fill(Engine.colors[gridColors[val]])
                 self.background.blit(rect, (coord[0] * self.gridSize[0], coord[1] * self.gridSize[1]))
 
@@ -173,7 +175,7 @@ class Engine:
 
     def clearScreen(self) -> None:
         """Removes everything blitted on screen by covering everything with background."""
-        self.screen.blit(self.background, self.offset)
+        self.screen.blit(self.background.surface, self.offset)
 
     def updateScreen(self) -> None:
         """Renders necessary components to screen."""
@@ -255,7 +257,8 @@ class Engine:
             Transparency value (0-255) of rect
         """
         if size not in self.surfaceCache:
-            self.surfaceCache[size] = pygame.Surface(size)
+            #self.surfaceCache[size] = pygame.Surface(size)
+            self.surfaceCache[size] = Engine.Surface(size)
 
         surface = self.surfaceCache[size]
         surface.set_alpha(alpha)
@@ -281,7 +284,8 @@ class Engine:
         rel_y = radius
 
         if frameSize not in self.surfaceCache:
-            self.surfaceCache[frameSize] = pygame.Surface(frameSize)
+            #self.surfaceCache[frameSize] = pygame.Surface(frameSize)
+            self.surfaceCache[frameSize] = Engine.Surface(frameSize)
 
         surface = self.surfaceCache[frameSize]
         surface.fill(Engine.colors["white"])
@@ -307,7 +311,7 @@ class Engine:
         """
         pygame.draw.line(self.screen, fillColor, start, end, width)
 
-    def renderPolygon(self, color: tuple, points: list, surface = None) -> None:
+    def renderPolygon(self, color: tuple, points: list, surface: Engine.Surface = None) -> None:
         """
         Draws polygon to given surface
 
@@ -315,12 +319,10 @@ class Engine:
         ----------
         surface
             Surface to draw on (defaults to engine.screen)
-        pos: tuple
-            (x, y) pos for start of drawing
         points: list
             list of (x, y) pairs of points to connect
-        closed: bool
-            Indicates that the first and last points in the list should be connected
+        color: tuple
+            color to fill polygon
         
         """
         if surface is None:
@@ -329,7 +331,7 @@ class Engine:
             pygame.draw.polygon(surface.surface, color, points)
 
 
-    def renderSurface(self, source, dest: tuple = (0,0), area=None, flag: str = 0) -> None:
+    def renderSurface(self, source: Engine.Surface, dest: tuple = (0,0), area=None, flag: str = 0) -> None:
             self.screen.blit(source, dest, area=area, special_flags=flag)
 
 
@@ -379,10 +381,36 @@ class Engine:
         return board
 
 
-    def tile_texture(self, texture, size: tuple = None):
+    def load_image(self, filename: str) -> Engine.Surface:
+        """
+        Returns a surface containing the image 
+        corresponding to the given file. The file
+        must be contained within the engine's image
+        folder.
+
+        Parameters
+        ----------
+        filename: str
+            The name of the file inside the image folder
+
+        """
+        image_file = os.path.join(self.imageFolder, filename)
+        img = pygame.image.load(image_file)
+        img_surface = Engine.Surface((img.get_width(), img.get_height()), flag="srcalpha")
+        img_surface.surface = img
+        return img_surface
+
+    def tile_surface(self, surface: Engine.Surface, size: tuple = None) -> Engine.Surface:
+        """
+        Tiles a surface across a given area
+
+        Parameters
+        ----------
+
+        """
         if size is None:
             size = self.screenSize
-        img = texture.image
+        img = surface.surface
         result = Engine.Surface(size, flag="srcalpha", depth=32)
         for x in range(0, size[0], img.get_width()):
             for y in range(0, size[1], img.get_height()):
@@ -410,7 +438,16 @@ class Engine:
 
         def convert_alpha(self) -> None:
             self.surface.convert_alpha()
-            
+
+        def set_alpha(self, alpha: int = None) -> None:
+            self.surface.set_alpha(alpha)
+
+        def set_colorkey(self, color: tuple = None) -> None:
+            self.surface.set_colorkey(color)
+
+        def fill(self, color: tuple) -> None:
+            self.surface.fill(color)
+
         def invert(self):
             """Not operation relative to universe"""
             mask = pygame.mask.from_surface(self.surface)
@@ -481,13 +518,3 @@ class Engine:
             # as soon as the work is done.
             del target
             return texture
-
-
-    class Image:
-        def __init__(self, path: str):
-            self.image = pygame.image.load(path)
-
-
-        
-
-
