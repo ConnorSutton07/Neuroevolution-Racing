@@ -332,7 +332,24 @@ class Engine:
 
 
     def renderSurface(self, source: Engine.Surface, dest: tuple = (0,0), area=None, flag: str = 0) -> None:
-            self.screen.blit(source, dest, area=area, special_flags=flag)
+        """
+        Blits a surface to the screen
+
+        Parameters
+        ----------
+        source: Engine.Surface
+            the surface to be drawn to the screen
+        dest: tuple
+            the (x, y) coordinates of the upper left corner of the 
+            drawing area
+        area: Rect
+            an optional area rectangle that can be used to limit
+            the area of the drawing
+        flag: str
+            optional flag for additional instruction
+
+        """
+        self.screen.blit(source, dest, area=area, special_flags=flag)
 
 
     #def applyTexture(self, texture_path: str, surface: Engine.Surface = self.screen) -> Engine.Surface:
@@ -406,6 +423,10 @@ class Engine:
 
         Parameters
         ----------
+        surface: Engine.Surface
+            the surface that will be tiled
+        size: tuple 
+            (x, y) The width (x) and height (y) of the area to tile across
 
         """
         if size is None:
@@ -418,6 +439,17 @@ class Engine:
         return result
 
     def tileImageAsBackground(self, img_name: str):
+        """ 
+        Opens the image with the given file name 
+        and tiles it across the screen size to be
+        used as a background.
+
+        Parameters
+        ----------
+        img_name: str
+            the file name of the image to use as the background
+
+        """
         if img_name not in self.imageCache:
             self.imageCache[img_name] = pygame.image.load(os.path.join(self.imageFolder, img_name))
         img = self.imageCache[img_name]
@@ -427,28 +459,58 @@ class Engine:
 
 
     class Surface:
+        """
+        Used to contain and manipulate rendered objects such as
+        shapes, textures, images, etc.
+
+        """
         def __init__(self, size: tuple, flag: str = None, depth: int = 0):
             if (flag == "srcalpha"):
                 self.surface = pygame.Surface(size, pygame.SRCALPHA)
             else:
                 self.surface = pygame.Surface(size, depth=depth)
 
-        def blit(self, source, dest: tuple, area=None, flag: str = 0) -> None:
+        def blit(self, source: Engine.Surface, dest: tuple, area=None, flag: str = 0) -> None:
+            """ 
+            Draws a source surface onto this surface
+
+            Parameters
+            ----------
+            source: Engine.Surface
+                the surface to draw onto this surface
+            dest: tuple
+                The (x, y) coordinates of the upper left corner where the
+                source surface will be drawn
+            area: Rect
+                an optional area rectangle that can be used to limit
+                the area of the drawing
+            flag: str
+                optional flag for additional instruction
+            """
             self.surface.blit(source, dest, area=area, special_flags=flag)
 
         def convert_alpha(self) -> None:
+            """ 
+            Changes the pixel format of the surface to 
+            include per-pixel alpha value
+            
+            """
+        
             self.surface.convert_alpha()
 
         def set_alpha(self, alpha: int = None) -> None:
+            """ sets the alpha value for pixels contained in the surface """
             self.surface.set_alpha(alpha)
 
         def set_colorkey(self, color: tuple = None) -> None:
+            """  sets """
             self.surface.set_colorkey(color)
 
         def fill(self, color: tuple) -> None:
+            """ fills a surface with a given color """
             self.surface.fill(color)
 
-        def invert(self):
+        def invert(self) -> Engine.Surface:
             """Not operation relative to universe"""
             mask = pygame.mask.from_surface(self.surface)
             mask.invert()
@@ -457,7 +519,7 @@ class Engine:
             new_surface.surface = surface.copy()
             return new_surface
             
-        def union(self, surface):
+        def union(self, surface: Engine.Surface) -> Engine.Surface:
             """Union of two masks"""
             mask = pygame.mask.from_surface(self.surface)
             other_mask = pygame.mask.from_surface(innerSurface.surface)
@@ -467,7 +529,7 @@ class Engine:
             new_surface.surface = surface.copy()
             return new_surface
             
-        def intersection(self, surface):
+        def intersection(self, surface: Engine.Surface) -> Engine.Surface:
             """Intersection of two masks"""
             mask = pygame.mask.from_surface(self.surface)
             other_mask = pygame.mask.from_surface(innerSurface.surface)
@@ -477,7 +539,7 @@ class Engine:
             new_surface.surface = surface.copy()
             return new_surface
             
-        def difference(self, surface):
+        def difference(self, surface: Engine.Surface) -> Engine.Surface:
             """Difference of two masks"""
             outer_mask = pygame.mask.from_surface(self.surface)
             inner_mask = pygame.mask.from_surface(surface.surface)
@@ -487,34 +549,31 @@ class Engine:
             new_surface.surface = outer_surface.copy()
             return new_surface
             
-        def __and__(self, surface):
+        def __and__(self, surface: Engine.Surface) -> Engine.Surface:
             """Ex. surface1 & surface2"""
             return self.intersection(surface)
             
-        def __or__(self, surface):
+        def __or__(self, surface: Engine.Surface) -> Engine.Surface:
             """Ex. surface1 | surface2"""
             return self.union(surface)
             
-        def __sub__(self, surface):
+        def __sub__(self, surface) -> Engine.Surface:
             """Ex. surface1 - surface2"""
             return self.difference(surface)
             
-        def __NE__(self):
+        def __NE__(self) -> Engine.Surface:
             """Ex. !surface1"""
             return self.invert()
 
-        def apply_texture(self, texture):
+        def apply_texture(self, texture: Engine.Surface) -> Engine.Surface:
             """
-            Image should be  a 24 or 32bit image,
-            mask should be an 8 bit image with the alpha
-            channel to be applied
+            Stamps the texture of the given surface
+            across the area of the original surface
             
             """
             texture.convert_alpha()
             target = pygame.surfarray.pixels_alpha(texture.surface)
             target[:] = pygame.surfarray.array2d(self.surface)
-            # surfarray objets usually lock the Surface. 
-            # it is a good idea to dispose of them explicitly
-            # as soon as the work is done.
+
             del target
             return texture
