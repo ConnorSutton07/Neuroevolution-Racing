@@ -9,7 +9,14 @@ from core.settings import *
 from core.ui.engine import Engine
 import keyboard
 
+from random import randint
+
 def prepareTrackSurface(engine: Engine, environment: Environment) -> Engine.Surface:
+    """ 
+    This function is called once per run, and it prepares the track's surface 
+    so that recalculation of each component is not necessary every frame
+
+    """ 
     track = environment.track
 
     # retrieves the coordinates for all points on the inside and outside edges of the track
@@ -25,7 +32,7 @@ def prepareTrackSurface(engine: Engine, environment: Environment) -> Engine.Surf
     engine.renderPolygon((0, 0, 0), inner_edges, inner_surface)
 
     # load the texture that will be applied to the track
-    texture = engine.load_image("texture2.png")
+    texture = engine.load_image(TRACK_TEXTURE)
     texture = engine.tile_surface(texture)
 
     # remove the inside surface from the outside to create the track surface and apply the texture to the result
@@ -41,25 +48,39 @@ def PvAI():
     environment = Environment(track)
     track_surface = prepareTrackSurface(engine, environment)
 
+    pts = []
+    for i in range(100):
+        pt = (randint(-200, 200) + TRACK_ORIGIN[0], randint(-200, 200) + TRACK_ORIGIN[1])
+        pts.append(pt)
+
     while not keyboard.is_pressed('esc'):
         for step in range(1, SMOOTHNESS + 1):
             if engine.shouldRun():
                 engine.clearScreen()
-                engine.renderScene(_renderEnvironment, environment, track_surface)
+                engine.renderScene(_renderEnvironment, environment, track_surface, pts)
                 engine.updateScreen()
 
     engine.exit()
 
 
     
-def _renderEnvironment(engine: Engine, environment: Environment, track_surface: Engine.Surface) -> None:
+def _renderEnvironment(engine: Engine, environment: Environment, track_surface: Engine.Surface, pts: list) -> None:
     """ 
     Contains all the instructions for the engine to render 
     the environment to the screen
 
     """
-    engine.tileImageAsBackground("grass.png")
+    engine.tileImageAsBackground(BACKGROUND)
     engine.renderSurface(track_surface)
+
+
+    for pt in pts:
+        if environment.trackContains(pt):
+            engine.renderCircle(pt, 10, (0, 255, 0))
+        else:
+            engine.renderCircle(pt, 10, (255, 0, 0))
+   # pt = (400, 400)
+
 
 
 

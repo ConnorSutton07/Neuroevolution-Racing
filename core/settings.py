@@ -24,5 +24,6 @@ TRACK_ORIGIN = (400, 300)
 TRACK_SCALE = 1.5
 
 # ASSET PATHS
-BACKGROUND = 'assets/grass.png'
+BACKGROUND = 'grass.png'
+TRACK_TEXTURE = 'texture2.png'
 

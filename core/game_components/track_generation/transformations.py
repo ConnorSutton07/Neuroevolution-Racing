@@ -47,11 +47,17 @@ def to_euclidean(polar_edges: np.array, radii: list, thetas: list) -> np.array:
     euclidean_edges = np.array([np.stack([left_x, left_y], axis=1), np.stack([right_x, right_y], axis=1)])
     return euclidean_edges
 
-def recenter(edges: np.array, origin: tuple):
-    """
-    Recenters all points around new origin
+def revert_to_polar(pt: tuple) -> np.array:
+    """ 
+    Returns a radius based on euclidean coordinates
 
     """
-    for edge in edges:
-        edge = np.array(list(map(lambda pt: (pt[0] + origin[0], pt[1] + origin[1]), edge)))
-    return edges
+    #print("Before:", pt)
+    if pt[0] == 0:
+        pt = (pt[0] + 1e-5, pt[1]) # avoid divide by 0
+    r = np.sqrt(pt[0]**2 + pt[1]**2)
+    theta = np.arctan2(pt[1], pt[0]) 
+    theta = (theta + (2 * np.pi)) % (2 * np.pi) # map from [-pi, pi] to [0, 2pi]
+    #print("After:", (r, theta))
+    return r, theta
+

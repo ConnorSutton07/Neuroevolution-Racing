@@ -8,6 +8,8 @@ import numpy as np
 class Environment:
     def __init__(self, track: Track) -> None:
         self.track = track
+        self.original_inner = track.getInnerEdges()
+        self.original_outer = track.getOuterEdges()
         self.prepareTrack()
 
 
@@ -24,5 +26,13 @@ class Environment:
 
         self.track.setFinalEuclidean(np.array([inner_edges, outer_edges]))
 
+    def trackContains(self, pt: tuple) -> bool:
+        """ 
+        Determines whether a given point resides inside the track
 
-    
+        """ 
+
+        pt = (pt[0] / TRACK_SCALE - TRACK_ORIGIN[0], pt[1] / TRACK_SCALE - TRACK_ORIGIN[1])
+        return self.track.contains(pt)
+
+

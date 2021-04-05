@@ -6,14 +6,13 @@ import numpy as np
 from core.game_components.track_generation.perlin import *
 from core.game_components.track_generation.transformations import *
 import random
-
+from scipy.interpolate import interp1d
 
 class Track:
     def __init__(self,
             type: str = "default",
             shape: tuple = (30, 10),
             point_density: int = 5,
-            radius_offset: float = 10,
             theta_offset: float = 50,
             perturbation: callable = lambda i: (i%10) * (10 * np.sin(i)**2)
             ) -> None:
@@ -21,12 +20,14 @@ class Track:
         self.shape = shape
         self.point_density = point_density
         self.points_per_edge = shape[1] * point_density
-        self.radius_offset = radius_offset
+        self.radius_offset = 125 + random.randint(-30, 30)
         self.theta_offset = theta_offset
         if self.type == "perlin":
             self.basic_euclidean_edges, self.polar_edges, self.euclidean_edges = self.perlin_track()
         else:
             self.basic_euclidean_edges, self.polar_edges, self.euclidean_edges = self.default_track(perturbation)
+
+        self.lerp = interp1d(self.polar_edges[0].T[1], self.polar_edges[0].T[0])
 
        # self.plot()
 
@@ -73,6 +74,7 @@ class Track:
         basic_euclidean_edges = np.array([left_basic_edge, right_basic_edge])
 
         polar_edges, radii, thetas = to_polar(basic_euclidean_edges, radius_offset, theta_offset)
+       
         euclidean_edges = to_euclidean(polar_edges, radii, thetas)
 
         return (basic_euclidean_edges, polar_edges, euclidean_edges)
@@ -82,7 +84,7 @@ class Track:
     def perlin_track(self, octaves: int = 5, amplitude: int = 85, smoothing_factor: int = 30) -> tuple:
         amplitude = amplitude + random.randint(-5, 5)
         density = self.point_density 
-        radius_offset = 125 + random.randint(-30, 30)
+        radius_offset = self.radius_offset
         theta_offset = 0
         width = self.shape[0]  
         left = get_perlin_line(density, density * self.shape[1], octaves=octaves, amplitude=amplitude)
@@ -94,9 +96,28 @@ class Track:
         basic_euclidean_edges = np.array([left, right])
 
         polar_edges, radii, thetas = to_polar(basic_euclidean_edges, radius_offset, theta_offset)
+        print(polar_edges)
         euclidean_edges = to_euclidean(polar_edges, radii, thetas)
 
         return (basic_euclidean_edges, polar_edges, euclidean_edges)
+
+    def contains(self, pt: tuple) -> bool:
+        r, theta = revert_to_polar(pt)
+        #theta = theta * 
+        #r = r - self.radius_offset
+
+        try:
+            left_r = self.lerp(theta)
+            print("Radius at", theta, ":", left_r, "-", left_r + self.shape[0])
+            right_r = r + self.shape[0]
+            if (r >= left_r and r <= right_r):
+                return True
+            else:
+                return False
+        except ValueError as e:
+            return False
+
+
 
         
     def plot(self) -> None:
@@ -131,6 +152,19 @@ class Track:
            
         plt.grid(ls="--", alpha=0.25)
         plt.title("Euclidean - " + self.type) 
+
+        plt.xlabel("x")
+        plt.ylabel("y")
+
+        plt.figure()
+        thetas = np.linspace(0, np.pi * 2, 100)
+        rs = np.zeros(100,)
+        for i in range(thetas.shape[0]):
+            rs[i] = self.lerp(thetas[i])
+        plt.plot(rs, thetas, c="green")
+
+        plt.grid(ls="--", alpha=0.25)
+        plt.title("Polar Interpolated") 
 
         plt.xlabel("x")
         plt.ylabel("y")

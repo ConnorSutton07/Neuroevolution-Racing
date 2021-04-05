@@ -258,12 +258,12 @@ class Engine:
         """
         if size not in self.surfaceCache:
             #self.surfaceCache[size] = pygame.Surface(size)
-            self.surfaceCache[size] = Engine.Surface(size)
+            self.surfaceCache[size] = Engine.Surface(size, flag="srcalpha")
 
         surface = self.surfaceCache[size]
         surface.set_alpha(alpha)
         surface.fill(fillColor)
-        self.screen.blit(surface, pos)
+        self.screen.blit(surface.surface, pos)
 
     def renderCircle(self, pos: tuple, radius: float, fillColor: tuple, alpha: int = 255) -> None:
         """
@@ -285,15 +285,15 @@ class Engine:
 
         if frameSize not in self.surfaceCache:
             #self.surfaceCache[frameSize] = pygame.Surface(frameSize)
-            self.surfaceCache[frameSize] = Engine.Surface(frameSize)
+            self.surfaceCache[frameSize] = Engine.Surface(frameSize, flag="srcalpha")
 
         surface = self.surfaceCache[frameSize]
         surface.fill(Engine.colors["white"])
         surface.set_colorkey(Engine.colors["white"])
         surface.set_alpha(alpha)
 
-        pygame.draw.circle(surface, fillColor, (rel_x, rel_y), radius)
-        self.screen.blit(surface, pos)
+        pygame.draw.circle(surface.surface, fillColor, (rel_x, rel_y), radius)
+        self.screen.blit(surface.surface, pos)
 
     def renderLine(self, start: tuple, end: tuple, width: int, fillColor: tuple) -> None:
         """
