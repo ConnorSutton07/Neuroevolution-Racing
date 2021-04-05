@@ -349,7 +349,7 @@ class Engine:
             optional flag for additional instruction
 
         """
-        self.screen.blit(source, dest, area=area, special_flags=flag)
+        self.screen.blit(source.surface, dest, area=area, special_flags=flag)
 
 
     #def applyTexture(self, texture_path: str, surface: Engine.Surface = self.screen) -> Engine.Surface:
