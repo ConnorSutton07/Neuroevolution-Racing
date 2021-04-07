@@ -36,7 +36,15 @@ def prepareTrackSurface(engine: Engine, environment: Environment) -> Engine.Surf
     texture = engine.tile_surface(texture)
 
     # remove the inside surface from the outside to create the track surface and apply the texture to the result
+    
     outer_surface = (outer_surface - inner_surface).apply_texture(texture)
+    #color_surface = engine.Surface(outer_surface.get_size(), flag='srcalpha')
+    #color_surface.fill(engine.colors['pastelDarkGreen'])
+    #outer_surface = outer_surface.apply_texture(color_surface)
+    # draw some boundaries
+    #engine.renderPolygon(engine.colors["pastelBlue"], outer_edges, outer_surface, width=5)
+    #engine.renderPolygon(engine.colors["pastelBlue"], inner_edges, outer_surface, width=5)
+
 
     return outer_surface
 
@@ -44,27 +52,28 @@ def prepareTrackSurface(engine: Engine, environment: Environment) -> Engine.Surf
 
 def PvAI():
     track = Track(type=TRACK_TYPE)
-    engine = Engine(SCREEN_SIZE, (1, 1), checkered=False, imageFolder=os.path.join(os.getcwd(), "assets"))
+    grid_colors = ('pastelLightGreen', 'pastelYellow', 'pastelDarkGreen')
+    engine = Engine(SCREEN_SIZE, (36, 27), checkered=False, title="NEUROEVOLUTION RACING", gridColors=grid_colors, imageFolder=os.path.join(os.getcwd(), "assets"))
     environment = Environment(track)
     track_surface = prepareTrackSurface(engine, environment)
 
-    pts = []
-    for i in range(3000):
-        pt = (randint(-300, 300) + TRACK_ORIGIN[0], randint(-300, 300) + TRACK_ORIGIN[1])
-        pts.append(pt)
+    # pts = []
+    # for i in range(3000):
+    #     pt = (randint(-300, 300) + TRACK_ORIGIN[0], randint(-300, 300) + TRACK_ORIGIN[1])
+    #     pts.append(pt)
 
     while not keyboard.is_pressed('esc'):
         for step in range(1, SMOOTHNESS + 1):
             if engine.shouldRun():
                 engine.clearScreen()
-                engine.renderScene(_renderEnvironment, environment, track_surface, pts)
+                engine.renderScene(_renderEnvironment, environment, track_surface)
                 engine.updateScreen()
 
     engine.exit()
 
 
     
-def _renderEnvironment(engine: Engine, environment: Environment, track_surface: Engine.Surface, pts: list) -> None:
+def _renderEnvironment(engine: Engine, environment: Environment, track_surface: Engine.Surface) -> None:
     """ 
     Contains all the instructions for the engine to render 
     the environment to the screen
@@ -74,13 +83,14 @@ def _renderEnvironment(engine: Engine, environment: Environment, track_surface: 
     engine.renderSurface(track_surface)
 
 
-    for pt in pts:
-        pt2 = (pt[0] - 2.5, pt[1] - 2.5)
-        if environment.trackContains(pt):
-            engine.renderCircle(pt2, 5, (0, 255, 0))
-        else:
-            engine.renderCircle(pt2, 5, (255, 0, 0))
-   # pt = (400, 400)
+
+#     for pt in pts:
+#         pt2 = (pt[0] - 2.5, pt[1] - 2.5)
+#         if environment.trackContains(pt):
+#             engine.renderCircle(pt2, 5, (0, 255, 0))
+#         else:
+#             engine.renderCircle(pt2, 5, (255, 0, 0))
+#    # pt = (400, 400)
 
 
 
