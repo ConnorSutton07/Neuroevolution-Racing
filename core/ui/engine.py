@@ -85,7 +85,7 @@ class Engine:
     def __init__(self,
                  screenSize: tuple,
                  numGrids: tuple,
-                 backgroundType: bool = False,
+                 backgroundType: str = 'checkered',
                  backgroundPath: str = None,
                  gridColors: tuple = ("black", "white", "black"),
                  targetFPS: int = 60,
@@ -114,6 +114,7 @@ class Engine:
         """
         self.targetFPS = targetFPS
         self.fontStyle = fontStyle
+        self.backgroundType = backgroundType
 
         pygame.init()
         pygame.font.init()
@@ -190,6 +191,9 @@ class Engine:
     def updateScreen(self) -> None:
         """Renders necessary components to screen."""
         pygame.display.flip()
+
+    def getBackgroundType(self) -> str:
+        return self.backgroundType
 
     def exit(self) -> None:
         """Has engine exit."""

@@ -31,16 +31,22 @@ def prepareTrackSurface(engine: Engine, environment: Environment) -> Engine.Surf
     engine.renderPolygon((255, 255, 255), outer_edges, outer_surface)
     engine.renderPolygon((0, 0, 0), inner_edges, inner_surface)
 
-    # load the texture that will be applied to the track
-    texture = engine.load_image(TRACK_TEXTURE)
-    texture = engine.tile_surface(texture)
+
+
+    if engine.getBackgroundType() == 'image':
+        # load the texture that will be applied to the track
+        texture = engine.load_image(TRACK_TEXTURE)
+        texture = engine.tile_surface(texture)
+    else:
+        texture = engine.Surface(outer_surface.get_size(), flag='srcalpha')
+        texture.fill(engine.colors['pastelDarkGreen'])
+        #texture = outer_surface.apply_texture(color_surface)
+
 
     # remove the inside surface from the outside to create the track surface and apply the texture to the result
     
     outer_surface = (outer_surface - inner_surface).apply_texture(texture)
-    #color_surface = engine.Surface(outer_surface.get_size(), flag='srcalpha')
-    #color_surface.fill(engine.colors['pastelDarkGreen'])
-    #outer_surface = outer_surface.apply_texture(color_surface)
+
     # draw some boundaries
     #engine.renderPolygon(engine.colors["pastelBlue"], outer_edges, outer_surface, width=5)
     #engine.renderPolygon(engine.colors["pastelBlue"], inner_edges, outer_surface, width=5)
@@ -56,7 +62,7 @@ def PvAI():
 
     engine = Engine(SCREEN_SIZE, 
                     numGrids = (27, 27), 
-                    backgroundType = 'checkered', 
+                    backgroundType = 'image', 
                     backgroundPath = BACKGROUND, 
                     gridColors = grid_colors, 
                     title = "NEUROEVOLUTION RACING",
