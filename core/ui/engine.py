@@ -66,14 +66,20 @@ class Engine:
         Blits line to screen.
     """
     colors = {
-        "green": (0, 255, 0),
-        "red": (255, 0, 0),
-        "purple": (200, 100, 200),
-        "blue": (0, 0, 255),
-        "mediumBlue": (150, 150, 255),
-        "lightBlue": (175, 175, 255),
-        "black": (0, 0, 0),
-        "white": (255, 255, 255),
+        "green"            : (0, 255, 0),
+        "red"              : (255, 0, 0),
+        "purple"           : (200, 100, 200),
+        "blue"             : (0, 0, 255),
+        "mediumBlue"       : (150, 150, 255),
+        "lightBlue"        : (175, 175, 255),
+        "black"            : (0, 0, 0),
+        "white"            : (255, 255, 255),
+        "brown"            : (82, 75, 36),
+        "pastelLightGreen" : (93, 255, 163),
+        "pastelDarkGreen"  : (36, 232, 189),
+        "pastelYellow"     : (246, 245, 155),
+        "pastelBlue"       : (193, 198, 252),
+        "pastelPink"       : (254, 151, 218)
     }
 
     def __init__(self,
@@ -156,7 +162,7 @@ class Engine:
         if checkered:
             for coord, val in Engine.checkerboard(numGrids).items():
                 #rect = pygame.Surface(self.gridSize)
-                rect = Engine.Surface(self.gridSize)
+                rect = Engine.Surface(self.gridSize, flag='srcalpha')
                 rect.fill(Engine.colors[gridColors[val]])
                 self.background.blit(rect, (coord[0] * self.gridSize[0], coord[1] * self.gridSize[1]))
 
@@ -311,7 +317,7 @@ class Engine:
         """
         pygame.draw.line(self.screen, fillColor, start, end, width)
 
-    def renderPolygon(self, color: tuple, points: list, surface: Engine.Surface = None) -> None:
+    def renderPolygon(self, color: tuple, points: list, surface: Engine.Surface = None, width: int = 0) -> None:
         """
         Draws polygon to given surface
 
@@ -323,12 +329,14 @@ class Engine:
             list of (x, y) pairs of points to connect
         color: tuple
             color to fill polygon
+        width: int
+            width of poylgon edges
         
         """
         if surface is None:
-            pygame.draw.polygon(self.screen, color, points)
+            pygame.draw.polygon(self.screen, color, points, width)
         else:
-            pygame.draw.polygon(surface.surface, color, points)
+            pygame.draw.polygon(surface.surface, color, points, width)
 
 
     def renderSurface(self, source: Engine.Surface, dest: tuple = (0,0), area=None, flag: str = 0) -> None:
@@ -431,10 +439,10 @@ class Engine:
         """
         if size is None:
             size = self.screenSize
-        img = surface.surface
+        img = surface#.surface
         result = Engine.Surface(size, flag="srcalpha", depth=32)
-        for x in range(0, size[0], img.get_width()):
-            for y in range(0, size[1], img.get_height()):
+        for x in range(0, size[0], img.surface.get_width()):
+            for y in range(0, size[1], img.surface.get_height()):
                 result.blit(img, (x, y))
         return result
 
@@ -487,7 +495,11 @@ class Engine:
             flag: str
                 optional flag for additional instruction
             """
-            self.surface.blit(source, dest, area=area, special_flags=flag)
+            self.surface.blit(source.surface, dest, area=area, special_flags=flag)
+
+        def get_size(self) -> tuple:
+            """ Get the dimensions of this surface """
+            return self.surface.get_size()
 
         def convert_alpha(self) -> None:
             """ 
@@ -506,9 +518,9 @@ class Engine:
             """  sets """
             self.surface.set_colorkey(color)
 
-        def fill(self, color: tuple) -> None:
+        def fill(self, color: tuple, flag: str = 0) -> None:
             """ fills a surface with a given color """
-            self.surface.fill(color)
+            self.surface.fill(color, special_flags=int(flag))
 
         def invert(self) -> Engine.Surface:
             """Not operation relative to universe"""
