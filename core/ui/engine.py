@@ -85,11 +85,12 @@ class Engine:
     def __init__(self,
                  screenSize: tuple,
                  numGrids: tuple,
-                 checkered: bool = False,
+                 backgroundType: bool = False,
+                 backgroundPath: str = None,
+                 gridColors: tuple = ("black", "white", "black"),
                  targetFPS: int = 60,
                  title: str = "Untitled Game",
                  fontStyle: str = "impact",
-                 gridColors: tuple = ("black", "white", "black"),
                  imageFolder: str = "images"
                  ) -> None:
         """
@@ -159,12 +160,15 @@ class Engine:
         self.screen.set_clip(pygame.Rect(*self.offset, backgroundSize[0]-clipping[0]*2, backgroundSize[1]-clipping[1]*2))
 
         # create checkered background
-        if checkered:
+        if backgroundType == 'checkered':
             for coord, val in Engine.checkerboard(numGrids).items():
                 #rect = pygame.Surface(self.gridSize)
                 rect = Engine.Surface(self.gridSize, flag='srcalpha')
                 rect.fill(Engine.colors[gridColors[val]])
                 self.background.blit(rect, (coord[0] * self.gridSize[0], coord[1] * self.gridSize[1]))
+        elif backgroundType == 'image':
+            self.tileImageAsBackground(backgroundPath)
+
 
     def shouldRun(self) -> bool:
         """
@@ -459,11 +463,12 @@ class Engine:
 
         """
         if img_name not in self.imageCache:
-            self.imageCache[img_name] = pygame.image.load(os.path.join(self.imageFolder, img_name))
+            #self.imageCache[img_name] = pygame.image.load(os.path.join(self.imageFolder, img_name))
+            self.imageCache[img_name] = self.load_image(os.path.join(self.imageFolder, img_name))
         img = self.imageCache[img_name]
         for x in range(0, self.screenSize[0], img.get_width()):
             for y in range(0, self.screenSize[1], img.get_height()):
-                self.screen.blit(img, (x, y))
+                self.background.blit(img, (x, y))
 
 
     class Surface:
@@ -498,8 +503,16 @@ class Engine:
             self.surface.blit(source.surface, dest, area=area, special_flags=flag)
 
         def get_size(self) -> tuple:
-            """ Get the dimensions of this surface """
+            """ Returns the dimensions of this surface """
             return self.surface.get_size()
+
+        def get_width(self) -> int: 
+            """ Returns the width of the surface """
+            return self.surface.get_width()
+
+        def get_height(self) -> int:
+            """ Return the height of the surface """
+            return self.surface.get_height()
 
         def convert_alpha(self) -> None:
             """ 

@@ -53,7 +53,16 @@ def prepareTrackSurface(engine: Engine, environment: Environment) -> Engine.Surf
 def PvAI():
     track = Track(type=TRACK_TYPE)
     grid_colors = ('pastelLightGreen', 'pastelYellow', 'pastelDarkGreen')
-    engine = Engine(SCREEN_SIZE, (36, 27), checkered=False, title="NEUROEVOLUTION RACING", gridColors=grid_colors, imageFolder=os.path.join(os.getcwd(), "assets"))
+
+    engine = Engine(SCREEN_SIZE, 
+                    numGrids = (27, 27), 
+                    backgroundType = 'checkered', 
+                    backgroundPath = BACKGROUND, 
+                    gridColors = grid_colors, 
+                    title = "NEUROEVOLUTION RACING",
+                    imageFolder = os.path.join(os.getcwd(), "assets"))
+
+
     environment = Environment(track)
     track_surface = prepareTrackSurface(engine, environment)
 
@@ -79,7 +88,6 @@ def _renderEnvironment(engine: Engine, environment: Environment, track_surface: 
     the environment to the screen
 
     """
-    engine.tileImageAsBackground(BACKGROUND)
     engine.renderSurface(track_surface)
 
 
