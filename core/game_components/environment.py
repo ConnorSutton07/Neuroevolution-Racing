@@ -8,9 +8,7 @@ import numpy as np
 class Environment:
     def __init__(self, track: Track) -> None:
         self.track = track
-        self.original_inner = track.getInnerEdges()
-        self.original_outer = track.getOuterEdges()
-        self.prepareTrack()
+        self.starting_point = self.prepareTrack()
 
 
     def prepareTrack(self) -> None:
@@ -24,7 +22,13 @@ class Environment:
         inner_edges = list(map(lambda x: (x[0] * TRACK_SCALE + TRACK_ORIGIN[0], x[1] * TRACK_SCALE + TRACK_ORIGIN[1]), inner_edges))
         outer_edges = list(map(lambda x: (x[0] * TRACK_SCALE + TRACK_ORIGIN[0], x[1] * TRACK_SCALE + TRACK_ORIGIN[1]), outer_edges))
 
+        inner_start_point = inner_edges[0]
+        outer_start_point = outer_edges[0]
+
+        starting_point = ((inner_start_point[0] + outer_start_point[0]) / 2, (inner_start_point[1] + outer_start_point[1]) / 2)
+
         self.track.setFinalEuclidean(np.array([inner_edges, outer_edges]))
+        return starting_point
 
     def trackContains(self, pt: tuple) -> bool:
         """ 
