@@ -23,7 +23,7 @@ def get_perlin_line(density: int, num_points: int, octaves: int = 4, amplitude: 
 
     return pts
 
-def get_wild_line(density: int, num_points: int, amplitude: int = 75) -> np.array:
+def get_perlin_line2(density: int, num_points: int, amplitude: int = 75) -> np.array:
     """
     This one's unpredictable but has done some cool stuff
 

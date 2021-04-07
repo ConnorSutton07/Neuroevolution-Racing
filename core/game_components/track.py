@@ -11,7 +11,7 @@ from scipy.interpolate import interp1d
 class Track:
     def __init__(self,
             type: str = "default",
-            shape: tuple = (30, 10),
+            shape: tuple = (40, 10),
             point_density: int = 5,
             theta_offset: float = 50,
             perturbation: callable = lambda i: (i%10) * (10 * np.sin(i)**2)
@@ -81,37 +81,37 @@ class Track:
 
 
 
-    def perlin_track(self, octaves: int = 5, amplitude: int = 85, smoothing_factor: int = 30) -> tuple:
+    def perlin_track(self, octaves: int = 5, amplitude: int = 80, smoothing_factor: int = 30) -> tuple:
         amplitude = amplitude + random.randint(-5, 5)
         density = self.point_density 
         radius_offset = self.radius_offset
         theta_offset = 0
         width = self.shape[0]  
-        left = get_perlin_line(density, density * self.shape[1], octaves=octaves, amplitude=amplitude)
+
+        if random.random() < 0:# 0.5:
+            left = get_perlin_line2(density, density * self.shape[1], amplitude=amplitude)
+        else:
+            octaves = octaves + random.randint(0, 1)
+            left = get_perlin_line(density, density * self.shape[1], octaves=octaves, amplitude=amplitude)
         left = smooth(left, self.shape[1], density * smoothing_factor)
+        #left = np.array(list(map(lambda pt: (pt[0] + (random.random() - 0.5), pt[1] + random.random() - 0.5), left)))
         right = np.array(list(map(lambda pt: (pt[0] + width, pt[1]), left)))
 
         left[-1][0] = left[0][0]
         right[-1][0] = right[0][0]
+
         basic_euclidean_edges = np.array([left, right])
 
         polar_edges, radii, thetas = to_polar(basic_euclidean_edges, radius_offset, theta_offset)
-        print(polar_edges)
         euclidean_edges = to_euclidean(polar_edges, radii, thetas)
 
         return (basic_euclidean_edges, polar_edges, euclidean_edges)
 
-    def contains(self, pt: tuple) -> bool:
+    def __contains__(self, pt: tuple) -> bool:
         r, theta = revert_to_polar(pt)
-        #theta = theta * 
-        #r = r - self.radius_offset
-
         try:
             left_r = self.lerp(theta)
-            #print("Radius at", theta, ":", left_r, "-", left_r + self.shape[0])
-            #right_r = r + self.shape[0]
             right_r = left_r + self.shape[0]
-            #if (r >= left_r):
             if (r >= left_r and r <= right_r):
                 return True
             else:

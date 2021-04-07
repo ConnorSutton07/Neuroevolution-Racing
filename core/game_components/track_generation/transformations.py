@@ -52,12 +52,12 @@ def revert_to_polar(pt: tuple) -> np.array:
     Returns a radius based on euclidean coordinates
 
     """
-    #print("Before:", pt)
+
     if pt[0] == 0:
         pt = (pt[0] + 1e-5, pt[1]) # avoid divide by 0
     r = np.sqrt(pt[0]**2 + pt[1]**2)
     theta = np.arctan2(pt[1], pt[0]) 
     theta = (theta + (2 * np.pi)) % (2 * np.pi) # map from [-pi, pi] to [0, 2pi]
-    #print("After:", (r, theta))
+
     return r, theta
 
