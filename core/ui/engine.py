@@ -606,3 +606,12 @@ class Engine:
 
             del target
             return texture
+
+        def rotate(self, angle: float) -> None:
+            """ 
+            Counterclockwise rotation of this surface. 
+            Negative values will rotate clockwise.
+
+            """
+
+            self.surface = self.surface.transform.rotate(angle)
