@@ -614,4 +614,4 @@ class Engine:
 
             """
 
-            self.surface = self.surface.transform.rotate(angle)
+            self.surface = pygame.transform.rotate(self.surface, angle)
