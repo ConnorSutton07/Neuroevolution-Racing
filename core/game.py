@@ -8,7 +8,7 @@ from core.game_components.environment import Environment
 from core.settings import *
 from core.ui.engine import Engine
 import keyboard
-
+import numpy as np
 from random import randint
 
 def prepareTrackSurface(engine: Engine, environment: Environment) -> Engine.Surface:
@@ -40,8 +40,6 @@ def prepareTrackSurface(engine: Engine, environment: Environment) -> Engine.Surf
     else:
         texture = engine.Surface(outer_surface.get_size(), flag='srcalpha')
         texture.fill(engine.colors['pastelDarkGreen'])
-        #texture = outer_surface.apply_texture(color_surface)
-
 
     # remove the inside surface from the outside to create the track surface and apply the texture to the result
     
@@ -78,6 +76,7 @@ def PvAI():
     #     pts.append(pt)
 
     while not keyboard.is_pressed('esc'):
+        environment.step()
         for step in range(1, SMOOTHNESS + 1):
             if engine.shouldRun():
                 engine.clearScreen()
@@ -95,7 +94,19 @@ def _renderEnvironment(engine: Engine, environment: Environment, track_surface: 
 
     """
     engine.renderSurface(track_surface)
+    renderCar(engine, environment)
 
+
+def renderCar(engine: Engine, environment: Environment) -> None:
+    car = environment.getCar()
+    car_state = car.get_state()
+    #engine.renderCircle(car.p, 10, engine.colors['black'])
+    carSurface = engine.load_image('frog-car-big.png')
+    carSurface.rotate(np.degrees(car_state['vel'][1]))
+    # print(car_state['pos'])
+    # print(car_state['vel'])
+
+    engine.renderSurface(carSurface, car_state['pos'])
 
 
 #     for pt in pts:

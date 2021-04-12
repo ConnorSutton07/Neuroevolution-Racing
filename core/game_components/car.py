@@ -4,13 +4,15 @@ Race car with neural network decision making.
 
 from __future__ import annotations
 import numpy as np
+import keyboard
 
-from core.neural_net import FFNN
+from core.training.neural_net import FFNN
 
-class Racecar:
+class Car:
 	"""Haven't tested any of this yet."""
 	def __init__(
 			self,
+			ai: bool = True,
 			id: str = "",
 			architecture: tuple = (8, 6, 2),
 			initial_pos: np.ndarray = None,
@@ -19,6 +21,7 @@ class Racecar:
 			max_turning_rate: float = np.radians(135),
 			max_acceleration: float = 5,
 			) -> None:
+		self.isAi = ai
 		self.id = id  # this should be base 36 number for uniqueness and to minimize digits
 		self.network = FFNN(architecture, outputActivation = "linear")  # can decide steering, acceleration
 		self.initial_p = initial_pos if initial_pos is not None else np.array([0., 0.])  # position
@@ -31,7 +34,7 @@ class Racecar:
 		self.max_acceleration = max_acceleration
 		self.steps = 0  # number of steps made
 		self.alive = True
-		self.resets = 0  # num times this racecar has been reset
+		self.resets = 0  # num times this car has been reset
 
 	def step(self) -> None:
 		"""Updates cars state."""
@@ -39,16 +42,20 @@ class Racecar:
 		self.v += self.a
 		self.steps += 1
 
-	def autostep(self, rayLengths: np.ndarray) -> None:
+	def autostep(self, rayLengths: np.ndarray = None) -> None:
 		""""Calculates AI controls then takes a step."""
-		steering, throttle = self.get_optimal_controls(rayLengths)
+		if self.isAi:
+			steering, throttle = self.get_optimal_controls(rayLengths)
+		else:
+			steering, throttle = get_player_controls()
 		self.turn(steering)
 		self.accelerate(throttle)
 		self.step()
 
 	def turn(self, d_theta: float) -> None:
 		"""Rotates direction ccw by theta degrees in radians, def need to test this."""
-		d_theta = (d_theta / abs(d_theta)) * min(abs(d_theta), self.max_turning_rate)
+		if d_theta != 0:
+			d_theta = (d_theta / abs(d_theta)) * min(abs(d_theta), self.max_turning_rate)
 		cos_d_theta = np.cos(d_theta)
 		sin_d_theta = np.sin(d_theta)
 		self.v = np.array([[cos_d_theta, -sin_d_theta], [sin_d_theta, cos_d_theta]]) @ self.v
@@ -62,11 +69,11 @@ class Racecar:
 		self.a = min(a, self.max_acceleration)
 
 	def is_alive(self) -> bool:
-		"""Returns whether racecar is alive or not."""
+		"""Returns whether car is alive or not."""
 		return self.alive
 
 	def kill(self) -> None:
-		"""Kills racecar and sets pos and vel to 0."""
+		"""Kills car and sets pos and vel to 0."""
 		self.alive = False
 		self.p = np.array([0., 0.])
 		self.v = np.array([0., 0.])
@@ -76,7 +83,7 @@ class Racecar:
 		return self.network.getParams()
 
 	def reset(self) -> None:
-		"""Resets state of this racecar to initial values."""
+		"""Resets state of this car to initial values."""
 		self.p = self.initial_p.copy()
 		self.v = self.initial_v.copy()
 		self.a = self.initial_a.copy()
@@ -85,7 +92,7 @@ class Racecar:
 		self.resets += 1
 
 	def get_state(self) -> dict:
-		"""Returns info about racecar's state"""
+		"""Returns info about car's state"""
 		return {
 			"pos": self.p,
 			"vel": self.v,
@@ -93,7 +100,22 @@ class Racecar:
 			"alive": self.alive,
 		}
 
-	def __eq__(self, other: Racecar) -> bool:
-		"""Checks if this racecar and other racecar are equal via id."""
+	def __eq__(self, other: Car) -> bool:
+		"""Checks if this car and other car are equal via id."""
 		return self.id == other.id
 
+
+
+def get_player_controls():
+	steering = 0
+	throttle = 0
+	if keyboard.is_pressed('w'):
+		throttle = 1
+	if keyboard.is_pressed('a'):
+		steering = .02
+	if keyboard.is_pressed('s'):
+		throttle = -1
+	if keyboard.is_pressed('d'):
+		steering = -.02
+	return steering, throttle
+	
