@@ -102,7 +102,7 @@ def renderCar(engine: Engine, environment: Environment) -> None:
     car_state = car.get_state()
     #engine.renderCircle(car.p, 10, engine.colors['black'])
     carSurface = engine.load_image('frog-car-big.png')
-    carSurface.rotate(np.degrees(car_state['vel'][1]))
+    carSurface.rotate(np.degrees(car_state['dir']))
     # print(car_state['pos'])
     # print(car_state['vel'])
 
