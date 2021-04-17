@@ -11,7 +11,7 @@ os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"  # hide Pygame greeting messag
 
 
 # SCREEN
-SCREEN_SIZE = (800, 600)
+SCREEN_SIZE = (1600, 1200)
 
 # FPS AND DISPLAY
 TARGET_FPS = 60
@@ -24,5 +24,5 @@ TRACK_SCALE = 1.5
 
 # ASSET PATHS
 TRACK_TEXTURE = 'earth2.png'
-FROG_CAR = 'frog-car-big.png'
+FROG_CAR = 'frog-car-fitted.png'
 BACKGROUND = 'new_flowers-big.png'

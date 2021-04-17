@@ -60,7 +60,7 @@ def PvAI():
 
     engine = Engine(SCREEN_SIZE, 
                     numGrids = (27, 27), 
-                    backgroundType = 'image', 
+                    backgroundType = 'checkered', 
                     backgroundPath = BACKGROUND, 
                     gridColors = grid_colors, 
                     title = "NEUROEVOLUTION RACING",
@@ -101,7 +101,7 @@ def renderCar(engine: Engine, environment: Environment) -> None:
     car = environment.getCar()
     car_state = car.get_state()
     #engine.renderCircle(car.p, 10, engine.colors['black'])
-    carSurface = engine.load_image('frog-car-big.png')
+    carSurface = engine.load_image(FROG_CAR)
     carSurface.rotate(np.degrees(car_state['dir']))
     # print(car_state['pos'])
     # print(car_state['vel'])
