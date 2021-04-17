@@ -31,6 +31,7 @@ class Car:
 
 		self.max_turning_rate = max_turning_rate
 		self.max_momentum = max_momentum
+		self.boost = self.max_momentum * 1.5
 		self.steps = 0  # number of steps made
 		self.alive = True
 		self.resets = 0  # num times this car has been reset
@@ -46,9 +47,9 @@ class Car:
 		if self.isAi:
 			steering, throttle = self.get_optimal_controls(rayLengths)
 		else:
-			steering, throttle = get_player_controls()
+			steering, throttle, boost = get_player_controls()
 		self.turn(steering)
-		self.accelerate(throttle)
+		self.accelerate(throttle, boost)
 		self.step()
 
 	def turn(self, d_theta: float) -> None:
@@ -58,7 +59,7 @@ class Car:
 		"""Gets turn angle from neural network."""
 		return self.network.feedForward(rayLengths)  # steering angle, acceleartion
 
-	def accelerate(self, a) -> None:
+	def accelerate(self, a, boost) -> None:
 		""" Sets velcoity """
 
 		cos_d = np.cos(self.d) + (2 * np.pi) % (2 * np.pi)
@@ -67,7 +68,11 @@ class Car:
 		if a == 0:
 			self.m *= 0.9
 		else:
-			self.m = max(min(self.m + a, self.max_momentum), -self.max_momentum)
+			if boost:
+				self.m = max(min(self.m + a + self.boost, self.max_momentum + self.boost), -self.max_momentum + self.boost)
+			else:
+				self.m = max(min(self.m + a, self.max_momentum), -self.max_momentum)
+
 		self.v = self.m * np.array([cos_d, sin_d])
 
 
@@ -113,6 +118,7 @@ class Car:
 def get_player_controls():
 	direction = 0
 	throttle = 0
+	boost = 0
 	if keyboard.is_pressed('w'):
 		throttle = .15
 	if keyboard.is_pressed('a'):
@@ -121,7 +127,9 @@ def get_player_controls():
 		throttle = -.15
 	if keyboard.is_pressed('d'):
 		direction = -.1
+	if keyboard.is_pressed('space'):
+		boost = 1
 	#self.d += direction
 	#velocity = throttle * np.array([np.cos(direction), np.sin(direction)])
-	return direction, throttle
+	return direction, throttle, boost
 	
