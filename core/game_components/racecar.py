@@ -64,7 +64,6 @@ class Racecar:
 		"""Updates cars state."""
 		steering, throttle = self.get_controls(environment)
 		print(c0)
-		print(inTrack)
 		self.turn(steering)
 		self.accelerate(throttle)
 		#print("s:", round(self.s, 3), "d:", np.round(self.d, 3), "a:", round(self.a, 3))

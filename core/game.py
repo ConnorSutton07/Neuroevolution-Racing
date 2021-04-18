@@ -55,12 +55,14 @@ def prepareTrackSurface(engine: Engine, environment: Environment) -> Engine.Surf
 
 
 def PvAI():
+	print("Generating track...")
 	track = Track(type=TRACK_TYPE)
 	grid_colors = ('pastelLightGreen', 'pastelYellow', 'pastelDarkGreen')
 
+	print("Initialzing engine...")
 	engine = Engine(SCREEN_SIZE, 
 					numGrids = (27, 27), 
-					backgroundType = 'checkered', 
+					backgroundType = 'image', 
 					backgroundPath = BACKGROUND, 
 					gridColors = grid_colors, 
 					title = "NEUROEVOLUTION RACING",
