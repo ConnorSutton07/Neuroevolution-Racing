@@ -108,10 +108,14 @@ def renderCar(engine: Engine, environment: Environment, carSurface) -> None:
 	# print(car_state['pos'])
 	# print(car_state['vel'])
 	rect = carSurface.surface.get_rect()
-	engine.renderRect(car_state['pos'], (rect.width, rect.height), (0, 255, 0), 100)
+	#engine.renderRect(car_state['pos'], (rect.width, rect.height), (0, 255, 0), 100)
+	
 	pos = car_state['pos']
-	engine.renderSurface(carSurface, (pos[0] - int(rect.width/2), pos[1] - int(rect.height/2)))
-	engine.renderLine((car.p[0], car.p[1]), (car.p[0] + 50 * car.d[0], car.p[1] + 50 * car.d[1]), 5, (255, 0, 0))
+	if environment.trackContains(pos):
+		engine.renderSurface(carSurface, (pos[0] - int(rect.width/2), pos[1] - int(rect.height/2)))
+	else:
+		engine.renderCircle((pos[0] - 5, pos[1] - 5), 10, engine.colors['red'], 255)
+	#engine.renderLine((car.p[0], car.p[1]), (car.p[0] + 50 * car.d[0], car.p[1] + 50 * car.d[1]), 5, (255, 0, 0))
 
 
 #	 for pt in pts:

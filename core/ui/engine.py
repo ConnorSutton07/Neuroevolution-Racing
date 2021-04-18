@@ -626,3 +626,16 @@ class Engine:
 			#rot_image = pygame.transform.rotate(self.surface, angle)
 			#rot_image.get_rect().center = loc
 			#self.surface = rot_image
+
+	class Particle:
+		def __init__(self) -> None:
+			self.particles = []
+
+		def emit(self) -> None:
+			pass
+	
+		def add_particles(self, pos:tuple, size: int, n: int = 25) -> None:
+			pass 
+
+		def delete_particles(self) -> None:
+			pass

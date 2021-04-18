@@ -23,7 +23,7 @@ class Racecar:
 			speed_decay: float = 0.9125,
 			max_turning_rate: float = np.radians(5),
 			max_speed: float = 10,
-			max_acceleration: float = 1,
+			max_acceleration: float = 1
 			) -> None:
 		if controller_type not in Racecar.valid_controllers:
 			raise TypeError("Controller type must be in " + str(Racecar.valid_controllers))
@@ -54,20 +54,24 @@ class Racecar:
 		self.max_turning_rate = max_turning_rate
 		self.max_speed = max_speed
 		self.max_acceleration = max_acceleration
-		
 		self.steps = 0  # number of steps taken
 		self.alive = True
 		self.resets = 0  # num times this racecar has been reset
+		self.laps_completed = 0
+		self.c0 = 0
 
-	def step(self, environment) -> None:
+	def step(self, environment: Environment, inTrack: bool, c0: float) -> None:
 		"""Updates cars state."""
 		steering, throttle = self.get_controls(environment)
+		print(c0)
+		print(inTrack)
 		self.turn(steering)
 		self.accelerate(throttle)
-		print("s:", round(self.s, 3), "d:", np.round(self.d, 3), "a:", round(self.a, 3))
+		#print("s:", round(self.s, 3), "d:", np.round(self.d, 3), "a:", round(self.a, 3))
 		self.p += self.s * self.d
 		self.s *= self.speed_decay
 		self.steps += 1
+
 
 	def accelerate(self, throttle: float) -> None:
 		"""Sets acceleration."""
@@ -90,7 +94,7 @@ class Racecar:
 			sign =  (d_theta / magnitude)
 			d_theta = sign * min(magnitude, self.max_turning_rate)
 			
-		cos_d_theta = np.cos(d_theta)
+		cos_d_theta = np.cos(d_theta)	
 		sin_d_theta = np.sin(d_theta)
 		
 		rotation_matrix = np.array([[cos_d_theta, -sin_d_theta], [sin_d_theta, cos_d_theta]])  # linear transformation

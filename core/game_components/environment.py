@@ -15,7 +15,9 @@ class Environment:
         self.car = Racecar("player")
 
     def step(self) -> None:
-        self.car.step(None)
+        pt = self.scale(self.car.p)
+        c0 = self.track.getTheta(pt)
+        self.car.step(None, (pt in self.track), (2 * np.pi) - c0)
 
     def getCar(self) -> Car:
         return self.car
@@ -44,10 +46,9 @@ class Environment:
         Determines whether a given point resides inside the track
 
         """ 
-        #print(TRACK_ORIGIN)
-        #pt = (pt[0] / TRACK_SCALE - TRACK_ORIGIN[0], pt[1] / TRACK_SCALE - TRACK_ORIGIN[1])
-        pt = ((pt[0] - TRACK_ORIGIN[0]) / TRACK_SCALE, (pt[1] - TRACK_ORIGIN[1]) / TRACK_SCALE)
-        #pt = (pt[0] / TRACK_SCALE, pt[1] / TRACK_SCALE)
-        return self.track.contains(pt)
+        return self.scale(pt) in self.track
+
+    def scale(self, pt: tuple) -> tuple:
+        return ((pt[0] - TRACK_ORIGIN[0]) / TRACK_SCALE, (pt[1] - TRACK_ORIGIN[1]) / TRACK_SCALE)
 
 
