@@ -24,5 +24,6 @@ TRACK_SCALE = 1.5 * (SCREEN_SIZE[0] / 800)
 
 # ASSET PATHS
 TRACK_TEXTURE = 'earth2.png'
-FROG_CAR = 'frog-car-big.png'
+FROG_CAR = 'frog-car.png'
 BACKGROUND = 'new_flowers-big.png'
+FIRE_COLORS = [(242, 163, 15), (242, 139, 12), (242, 73, 12), (115, 12, 2), (64, 6, 1)]
