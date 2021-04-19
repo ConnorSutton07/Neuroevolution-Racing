@@ -1,8 +1,7 @@
-"""
+"""illustrt
 
 """
 from core.game_components.track import Track
-from core.game_components.car import Car
 from core.game_components.racecar import Racecar
 from core.settings import *
 import numpy as np
@@ -11,10 +10,13 @@ class Environment:
     def __init__(self, track: Track) -> None:
         self.track = track
         self.starting_point = self.prepareTrack()
-        #self.car = Car(ai=False, id='1', initial_pos=self.starting_point)
         self.car = Racecar("player")
 
     def step(self) -> None:
+        """ 
+        Moves game state a time step forward
+
+        """
         pt = self.scale(self.car.p)
         c0 = self.track.getTheta(pt)
         self.car.step(None, (pt in self.track), (2 * np.pi) - c0)
@@ -49,6 +51,11 @@ class Environment:
         return self.scale(pt) in self.track
 
     def scale(self, pt: tuple) -> tuple:
+        """ 
+        Shifts and scales the given point to 
+        be centered at the origin of the track.
+
+        """ 
         return ((pt[0] - TRACK_ORIGIN[0]) / TRACK_SCALE, (pt[1] - TRACK_ORIGIN[1]) / TRACK_SCALE)
 
 
