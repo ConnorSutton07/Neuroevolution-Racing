@@ -10,6 +10,7 @@ from core.ui.engine import Engine
 import keyboard
 import numpy as np
 from random import randint
+from copy import copy
 
 def prepareTrackSurface(engine: Engine, environment: Environment) -> Engine.Surface:
 	""" 
@@ -55,14 +56,12 @@ def prepareTrackSurface(engine: Engine, environment: Environment) -> Engine.Surf
 
 
 def PvAI():
-	print("Generating track...")
 	track = Track(type=TRACK_TYPE)
 	grid_colors = ('pastelLightGreen', 'pastelYellow', 'pastelDarkGreen')
 
-	print("Initialzing engine...")
 	engine = Engine(SCREEN_SIZE, 
 					numGrids = (27, 27), 
-					backgroundType = 'image', 
+					backgroundType = 'checkered', 
 					backgroundPath = BACKGROUND, 
 					gridColors = grid_colors, 
 					title = "NEUROEVOLUTION RACING",
@@ -97,27 +96,31 @@ def _renderEnvironment(engine: Engine, environment: Environment, track_surface: 
 
 	"""
 	engine.renderSurface(track_surface)
+	engine.emit()
 	renderCar(engine, environment, carSurface.copy())
+	
 
 
 
 def renderCar(engine: Engine, environment: Environment, carSurface) -> None:
 	car = environment.getCar()
 	car_state = car.get_state()
-	#engine.renderCircle(car.p, 10, engine.colors['black'])
+	pos = copy(car_state['pos'])
+	dir = copy(car_state['dir'])
 	
-	carSurface.rotate(np.degrees(car_state['dir']))
-	# print(car_state['pos'])
-	# print(car_state['vel'])
+	carSurface.rotate(np.degrees(dir))
+
 	rect = carSurface.surface.get_rect()
 	#engine.renderRect(car_state['pos'], (rect.width, rect.height), (0, 255, 0), 100)
 	
-	pos = car_state['pos']
+	if car_state['boost']:
+		engine.add_particles(pos, (-np.cos(dir), np.sin(dir)), FIRE_COLORS, size=5, N=3)
 	if environment.trackContains(pos):
 		engine.renderSurface(carSurface, (pos[0] - int(rect.width/2), pos[1] - int(rect.height/2)))
 	else:
 		engine.renderCircle((pos[0] - 5, pos[1] - 5), 10, engine.colors['red'], 255)
-	#engine.renderLine((car.p[0], car.p[1]), (car.p[0] + 50 * car.d[0], car.p[1] + 50 * car.d[1]), 5, (255, 0, 0))
+
+#engine.renderLine((car.p[0], car.p[1]), (car.p[0] + 50 * car.d[0], car.p[1] + 50 * car.d[1]), 5, (255, 0, 0))
 
 
 #	 for pt in pts:
