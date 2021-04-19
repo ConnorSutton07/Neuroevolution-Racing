@@ -9,7 +9,9 @@ Engine
 from __future__ import annotations
 import os
 import pygame
+import numpy.random as rand
 from copy import deepcopy
+
 
 __author__ = "Grant Holmes"
 __email__ = "g.holmes429@gmail.com"
@@ -170,6 +172,8 @@ class Engine:
 		elif backgroundType == 'image':
 			self.tileImageAsBackground(backgroundPath)
 
+		self.particles = []
+
 
 	def shouldRun(self) -> bool:
 		"""
@@ -305,6 +309,7 @@ class Engine:
 		surface.fill(Engine.colors["white"])
 		surface.set_colorkey(Engine.colors["white"])
 		surface.set_alpha(alpha)
+		#print(pos)
 
 		pygame.draw.circle(surface.surface, fillColor, (rel_x, rel_y), radius)
 		self.screen.blit(surface.surface, pos)
@@ -366,6 +371,25 @@ class Engine:
 
 		"""
 		self.screen.blit(source.surface, dest, area=area, special_flags=flag)
+
+
+	def emit(self) -> None:
+		if self.particles:
+			self.delete_particles()
+			for particle in self.particles:
+				particle.update()
+				self.renderCircle(*(particle.getAttributes()))
+
+	def add_particles(self, pos: tuple, dir: tuple, colors: list, size: int, N: int = 25) -> None:
+		for _ in range(N):
+			p = (pos[0] + rand.randint(-5, 5), pos[1] + rand.randint(-5, 5))
+			speed = 1 + rand.normal(0, 0.5)
+			particle = Particle(p, dir, colors[rand.randint(0, len(colors) - 1)], size, speed)
+			self.particles.append(particle)
+
+	def delete_particles(self) -> None:
+		p_copy = [p for p in self.particles if p.size > 0]
+		self.particles = p_copy
 
 
 	#def applyTexture(self, texture_path: str, surface: Engine.Surface = self.screen) -> Engine.Surface:
@@ -627,15 +651,18 @@ class Engine:
 			#rot_image.get_rect().center = loc
 			#self.surface = rot_image
 
-	class Particle:
-		def __init__(self) -> None:
-			self.particles = []
+class Particle:
+	def __init__(self, pos: tuple, dir: tuple, color: tuple, size: int, speed: int, shrink_rate: float = 0.2) -> None:
+		self.pos = pos 
+		self.dir = (dir[0] * speed, dir[1] * speed)
+		self.color = color 
+		self.size = size 
+		self.speed = speed
+		self.shrink_rate = shrink_rate 
 
-		def emit(self) -> None:
-			pass
-	
-		def add_particles(self, pos:tuple, size: int, n: int = 25) -> None:
-			pass 
+	def update(self) -> None:
+		self.pos = (self.pos[0] + self.dir[0], self.pos[1] + self.dir[1])
+		self.size -= self.shrink_rate
 
-		def delete_particles(self) -> None:
-			pass
+	def getAttributes(self) -> tuple:
+		return self.pos, self.size, self.color
