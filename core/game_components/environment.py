@@ -21,7 +21,7 @@ class Environment:
         c0 = self.track.getTheta(pt)
         self.car.step(None, (pt in self.track), (2 * np.pi) - c0)
 
-    def getCar(self) -> Car:
+    def getCar(self) -> Racecar:
         return self.car
 
     def prepareTrack(self) -> np.array:
