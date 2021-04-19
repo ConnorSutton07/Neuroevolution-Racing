@@ -5,6 +5,7 @@ Contains global game settings
 
 
 import os
+from PIL import Image
 #import psutil
 
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"  # hide Pygame greeting message
@@ -25,5 +26,9 @@ TRACK_SCALE = 1.5 * (SCREEN_SIZE[0] / 800)
 # ASSET PATHS
 TRACK_TEXTURE = 'earth2.png'
 FROG_CAR = 'frog-car.png'
+PARTICLE_SIZE = 5
+NUM_PARTICLES = 3
+
+
 BACKGROUND = 'new_flowers-big.png'
 FIRE_COLORS = [(242, 163, 15), (242, 139, 12), (242, 73, 12), (115, 12, 2), (64, 6, 1)]

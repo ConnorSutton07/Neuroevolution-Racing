@@ -111,10 +111,9 @@ def renderCar(engine: Engine, environment: Environment, carSurface) -> None:
 	carSurface.rotate(np.degrees(dir))
 
 	rect = carSurface.surface.get_rect()
-	#engine.renderRect(car_state['pos'], (rect.width, rect.height), (0, 255, 0), 100)
 	
 	if car_state['boost']:
-		engine.add_particles(pos, (-np.cos(dir), np.sin(dir)), FIRE_COLORS, size=5, N=3)
+		engine.add_particles(pos, (-np.cos(dir), np.sin(dir)), FIRE_COLORS, size=PARTICLE_SIZE, N=NUM_PARTICLES)
 	if environment.trackContains(pos):
 		engine.renderSurface(carSurface, (pos[0] - int(rect.width/2), pos[1] - int(rect.height/2)))
 	else:
