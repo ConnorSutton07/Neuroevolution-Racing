@@ -59,11 +59,15 @@ class Racecar:
 		self.resets = 0  # num times this racecar has been reset
 		self.laps_completed = 0
 		self.c0 = 0
+		self.boost = False
+		self.boost_speed = self.max_speed * 0.5#@0.5
 
 	def step(self, environment: Environment, inTrack: bool, c0: float) -> None:
 		"""Updates cars state."""
-		steering, throttle = self.get_controls(environment)
-		print(c0)
+		steering, throttle, boost = self.get_controls(environment)
+		
+		#print(c0)
+		self.boost = boost
 		self.turn(steering)
 		self.accelerate(throttle)
 		#print("s:", round(self.s, 3), "d:", np.round(self.d, 3), "a:", round(self.a, 3))
@@ -80,11 +84,13 @@ class Racecar:
 			self.a = raw_sign * min(raw_magnitude, self.max_acceleration)
 		else:
 			self.a = 0
-			
+		
 		if (self.s + self.a) != 0:
-			magnitude = abs(self.s + self.a)
-			sign = (self.s + self.a) / magnitude
-			self.s = sign * min(magnitude, self.max_speed)
+			boost = self.boost_speed * self.boost
+			max_speed = self.max_speed + boost
+			magnitude = abs(self.s + self.a) + boost
+			sign = (self.s + self.a) / (magnitude - boost)
+			self.s = sign * min(magnitude, max_speed)
 
 	def turn(self, d_theta: float) -> None:
 		"""Rotates direction ccw by theta degrees in radians, def need to test this."""
@@ -112,7 +118,8 @@ class Racecar:
 	def get_player_controls(self, environment) -> np.ndarray:
 		throttle = 0
 		steering = 0
-		
+		boost = False
+
 		if keyboard.is_pressed('w'):
 			throttle = 5
 		if keyboard.is_pressed('a'):
@@ -121,12 +128,14 @@ class Racecar:
 			throttle = -5
 		if keyboard.is_pressed('d'):
 			steering = 1
+		if keyboard.is_pressed('space'):
+			boost = True
 			
 		if keyboard.is_pressed('e'):  # emergency stop, debugging
 			self.s = 0
 			self.a = 0
 			
-		return steering, throttle
+		return steering, throttle, boost
 
 	def get_network_params(self) -> dict:
 		"""Gets important params from network."""
@@ -174,6 +183,7 @@ class Racecar:
 			"speed": self.s,
 			"accel": self.a,
 			"alive": self.alive,
+			"boost": self.boost
 		}
 
 	def __eq__(self, other: Racecar) -> bool:
