@@ -380,10 +380,11 @@ class Engine:
 				particle.update()
 				self.renderCircle(*(particle.getAttributes()))
 
-	def add_particles(self, pos: tuple, dir: tuple, colors: list, size: int, N: int = 25) -> None:
+	def add_particles(self, pos: tuple, dir: tuple, colors: list, size: int, N: int) -> None:
 		for _ in range(N):
 			p = (pos[0] + rand.randint(-5, 5), pos[1] + rand.randint(-5, 5))
 			speed = 1 + rand.normal(0, 0.5)
+			size += rand.randint(-1, 1)
 			particle = Particle(p, dir, colors[rand.randint(0, len(colors) - 1)], size, speed)
 			self.particles.append(particle)
 
