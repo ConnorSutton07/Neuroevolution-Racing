@@ -17,6 +17,7 @@ SCREEN_SIZE = (900, 675)
 # FPS AND DISPLAY
 TARGET_FPS = 60
 SMOOTHNESS = 3  # controls how fast and smooth animations run
+LAP_TEXT_POS = (200, 75)
 
 # TRACK
 TRACK_TYPE = "perlin"
