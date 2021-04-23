@@ -150,7 +150,6 @@ class Engine:
 
 		self.screenSize = screenSize
 		self.screen = pygame.display.set_mode(screenSize)
-		#self.surfaceCache[backgroundSize] = pygame.Surface(backgroundSize)
 		self.surfaceCache[backgroundSize] = Engine.Surface(backgroundSize, flag="srcalpha")
 		self.background = self.surfaceCache[backgroundSize]
 
@@ -275,7 +274,6 @@ class Engine:
 			Transparency value (0-255) of rect
 		"""
 		if size not in self.surfaceCache:
-			#self.surfaceCache[size] = pygame.Surface(size)
 			self.surfaceCache[size] = Engine.Surface(size, flag="srcalpha")
 
 		surface = self.surfaceCache[size]
@@ -283,7 +281,7 @@ class Engine:
 		surface.fill(fillColor)
 		self.screen.blit(surface.surface, pos)
 
-	def renderCircle(self, pos: tuple, radius: float, fillColor: tuple, alpha: int = 255) -> None:
+	def renderCircle(self, pos: tuple, radius: float, fillColor: tuple, alpha: int = 255, surface: Engine.Surface = None) -> None:
 		"""
 		Blits circle to screen.
 		Parameters
@@ -302,7 +300,6 @@ class Engine:
 		rel_y = radius
 
 		if frameSize not in self.surfaceCache:
-			#self.surfaceCache[frameSize] = pygame.Surface(frameSize)
 			self.surfaceCache[frameSize] = Engine.Surface(frameSize, flag="srcalpha")
 
 		surface = self.surfaceCache[frameSize]
@@ -314,7 +311,7 @@ class Engine:
 		pygame.draw.circle(surface.surface, fillColor, (rel_x, rel_y), radius)
 		self.screen.blit(surface.surface, pos)
 
-	def renderLine(self, start: tuple, end: tuple, width: int, fillColor: tuple) -> None:
+	def renderLine(self, start: tuple, end: tuple, width: int, fillColor: tuple, dest: Engine.Surface = None) -> None:
 		"""
 		Blits line to screen.
 		Parameters
@@ -328,9 +325,11 @@ class Engine:
 		fillColor: tuple
 			RGB values for color of rect
 		"""
-		pygame.draw.line(self.screen, fillColor, start, end, width)
+		surface = self.screen if dest is None else dest.surface
+		pygame.draw.line(surface, fillColor, start, end, width)
+	
 
-	def renderPolygon(self, color: tuple, points: list, surface: Engine.Surface = None, width: int = 0) -> None:
+	def renderPolygon(self, color: tuple, points: list, width: int = 0, dest: Engine.Surface = None) -> None:
 		"""
 		Draws polygon to given surface
 
@@ -346,10 +345,9 @@ class Engine:
 			width of poylgon edges
 		
 		"""
-		if surface is None:
-			pygame.draw.polygon(self.screen, color, points, width)
-		else:
-			pygame.draw.polygon(surface.surface, color, points, width)
+		surface = self.screen if dest is None else dest.surface
+		pygame.draw.polygon(surface, color, points, width)
+
 
 
 	def renderSurface(self, source: Engine.Surface, dest: tuple = (0,0), area=None, flag: str = 0) -> None:
@@ -374,6 +372,11 @@ class Engine:
 
 
 	def emit(self) -> None:
+		""" 
+		Draws all particles to screen after removing
+		those with negative size value
+
+		"""
 		if self.particles:
 			self.delete_particles()
 			for particle in self.particles:
@@ -381,6 +384,27 @@ class Engine:
 				self.renderCircle(*(particle.getAttributes()))
 
 	def add_particles(self, pos: tuple, dir: tuple, colors: list, size: int, N: int) -> None:
+		""" 
+		Adds particles based on given parameters with
+		some variability added to the position, speed,
+		and size.
+
+		Parameters
+		----------
+
+		pos: tuple
+			(x, y) coordinates of the particle. Subject to slight variability
+		dir: tuple
+			(dx, dy), indicates the direction of movement
+		colors: list
+			contains a list of colors; one will be randomly chosen as the 
+			particle's color
+		size: int
+			radius of the particle
+		N: int
+			number of particles to be added
+
+		"""
 		for _ in range(N):
 			p = (pos[0] + rand.randint(-5, 5), pos[1] + rand.randint(-5, 5))
 			speed = 1 + rand.normal(0, 0.5)
@@ -389,6 +413,11 @@ class Engine:
 			self.particles.append(particle)
 
 	def delete_particles(self) -> None:
+		""" 
+		Removes all particles that have shrunk to
+		a negative size
+
+		"""
 		p_copy = [p for p in self.particles if p.size > 0]
 		self.particles = p_copy
 
