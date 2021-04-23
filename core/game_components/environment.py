@@ -9,8 +9,8 @@ import numpy as np
 class Environment:
     def __init__(self, track: Track) -> None:
         self.track = track
-        self.starting_point = self.prepareTrack()
-        self.car = Racecar("player")
+        self.start_point, self.start_d = self.prepareTrack()
+        self.car = Racecar("player", initial_pos=self.start_point, initial_direction=self.start_d)
 
     def step(self) -> None:
         """ 
@@ -24,10 +24,14 @@ class Environment:
     def getCar(self) -> Racecar:
         return self.car
 
-    def prepareTrack(self) -> np.array:
+    def prepareTrack(self) -> tuple:
         """ 
         Scales the track to the proper size and moves it to
         the center of the map based on variables in Settings
+
+        Also finds the starting point of the track and 
+        the initial angle of the track to send to the 
+        cars.
 
         """
         inner_edges = self.track.getInnerEdges()
@@ -38,10 +42,14 @@ class Environment:
         inner_start_point = inner_edges[0]
         outer_start_point = outer_edges[0]
 
-        starting_point = ((inner_start_point[0] + outer_start_point[0]) / 2, (inner_start_point[1] + outer_start_point[1]) / 2)
+        starting_point = np.array([(inner_start_point[0] + outer_start_point[0]) / 2, (inner_start_point[1] + outer_start_point[1]) / 2])
+
+        x = inner_edges[-2][0] - inner_edges[0][0]
+        y = inner_edges[-2][1] - inner_edges[0][1]
+        starting_d = np.array([x / np.sqrt(x**2 + y**2), y / np.sqrt(x**2 + y**2)])
 
         self.track.setFinalEuclidean(np.array([inner_edges, outer_edges]))
-        return np.array(starting_point)
+        return starting_point, starting_d
 
     def trackContains(self, pt: tuple) -> bool:
         """ 
