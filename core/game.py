@@ -12,49 +12,6 @@ import numpy as np
 from random import randint
 from copy import copy
 
-def prepareTrackSurface(engine: Engine, environment: Environment) -> Engine.Surface:
-	""" 
-	This function is called once per run, and it prepares the track's surface 
-	so that recalculation of each component is not necessary every frame
-
-	""" 
-	track = environment.track
-
-	# retrieves the coordinates for all points on the inside and outside edges of the track
-	inner_edges = track.getInnerEdges()
-	outer_edges = track.getOuterEdges()
-
-	# create empty surfaces that will contain the inside/outside edges
-	outer_surface = engine.Surface(SCREEN_SIZE, flag="srcalpha")
-	inner_surface = engine.Surface(SCREEN_SIZE, flag="srcalpha")
-
-	# draw the edges to the corresponding surfaces
-	engine.renderPolygon((255, 255, 255), outer_edges, outer_surface)
-	engine.renderPolygon((0, 0, 0), inner_edges, inner_surface)
-
-
-
-	if engine.getBackgroundType() == 'image':
-		# load the texture that will be applied to the track
-		texture = engine.load_image(TRACK_TEXTURE)
-		texture = engine.tile_surface(texture)
-	else:
-		texture = engine.Surface(outer_surface.get_size(), flag='srcalpha')
-		texture.fill(engine.colors['pastelDarkGreen'])
-
-	# remove the inside surface from the outside to create the track surface and apply the texture to the result
-	
-	outer_surface = (outer_surface - inner_surface).apply_texture(texture)
-
-	# draw some boundaries
-	#engine.renderPolygon(engine.colors["pastelBlue"], outer_edges, outer_surface, width=5)
-	#engine.renderPolygon(engine.colors["pastelBlue"], inner_edges, outer_surface, width=5)
-
-
-	return outer_surface
-
-
-
 def PvAI():
 	track = Track(type=TRACK_TYPE)
 	grid_colors = ('pastelLightGreen', 'pastelYellow', 'pastelDarkGreen')
@@ -70,7 +27,7 @@ def PvAI():
 
 	environment = Environment(track)
 	track_surface = prepareTrackSurface(engine, environment)
-	carSurface = engine.load_image(FROG_CAR)  # added this here so we don't have to load image from file every time step
+	carSurface = engine.load_image(FROG_CAR) 
 
 	# pts = []
 	# for i in range(3000):
@@ -119,7 +76,8 @@ def renderCar(engine: Engine, environment: Environment, carSurface) -> None:
 	else:
 		engine.renderCircle((pos[0] - 5, pos[1] - 5), 10, engine.colors['red'], 255)
 
-#engine.renderLine((car.p[0], car.p[1]), (car.p[0] + 50 * car.d[0], car.p[1] + 50 * car.d[1]), 5, (255, 0, 0))
+	engine.printToScreen("Lap: " + str(car_state["lap"]), LAP_TEXT_POS, 50, engine.colors['black'])
+	engine.renderLine((car.p[0], car.p[1]), (car.p[0] + 50 * car.d[0], car.p[1] + 50 * car.d[1]), 5, (255, 0, 0))
 
 
 #	 for pt in pts:
@@ -132,7 +90,48 @@ def renderCar(engine: Engine, environment: Environment, carSurface) -> None:
 
 
 
+def prepareTrackSurface(engine: Engine, environment: Environment) -> Engine.Surface:
+	""" 
+	This function is called once per run, and it prepares the track's surface 
+	so that recalculation of each component is not necessary every frame
 
+	""" 
+	track = environment.track
+
+	# retrieves the coordinates for all points on the inside and outside edges of the track
+	inner_edges = track.getInnerEdges()
+	outer_edges = track.getOuterEdges()
+
+	# create empty surfaces that will contain the inside/outside edges
+	outer_surface = engine.Surface(SCREEN_SIZE, flag="srcalpha")
+	inner_surface = engine.Surface(SCREEN_SIZE, flag="srcalpha")
+
+	# draw the edges to the corresponding surfaces
+	engine.renderPolygon((255, 255, 255), outer_edges, dest=outer_surface)
+	engine.renderPolygon((0, 0, 0), inner_edges, dest=inner_surface)
+
+
+
+	if engine.getBackgroundType() == 'image':
+		# load the texture that will be applied to the track
+		texture = engine.load_image(TRACK_TEXTURE)
+		texture = engine.tile_surface(texture)
+	else:
+		texture = engine.Surface(outer_surface.get_size(), flag='srcalpha')
+		texture.fill(engine.colors['pastelDarkGreen'])
+
+	# remove the inside surface from the outside to create the track surface and apply the texture to the result
+	
+	outer_surface = (outer_surface - inner_surface).apply_texture(texture)
+	engine.renderLine(inner_edges[-2], outer_edges[-2], 15, engine.colors['white'], outer_surface)
+	#engine.renderLine()
+
+	# draw some boundaries
+	#engine.renderPolygon(engine.colors["pastelBlue"], outer_edges, outer_surface, width=5)
+	#engine.renderPolygon(engine.colors["pastelBlue"], inner_edges, outer_surface, width=5)
+
+
+	return outer_surface
 
 
 
