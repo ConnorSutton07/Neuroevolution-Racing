@@ -22,8 +22,8 @@ def PvAI():
 					backgroundPath = BACKGROUND, 
 					gridColors = grid_colors, 
 					title = "NEUROEVOLUTION RACING",
-					imageFolder = os.path.join(os.getcwd(), "assets"))
-
+					imageFolder = IMAGE_FOLDER,
+					fontStyle = os.path.join(FONT_FOLDER, FONT_FILE))
 
 	environment = Environment(track)
 	track_surface = prepareTrackSurface(engine, environment)
@@ -77,7 +77,7 @@ def renderCar(engine: Engine, environment: Environment, carSurface) -> None:
 		engine.renderCircle((pos[0] - 5, pos[1] - 5), 10, engine.colors['red'], 255)
 
 	engine.printToScreen("Lap: " + str(car_state["lap"]), LAP_TEXT_POS, 50, engine.colors['black'])
-	engine.renderLine((car.p[0], car.p[1]), (car.p[0] + 50 * car.d[0], car.p[1] + 50 * car.d[1]), 5, (255, 0, 0))
+	#engine.renderLine((car.p[0], car.p[1]), (car.p[0] + 50 * car.d[0], car.p[1] + 50 * car.d[1]), 5, (255, 0, 0))
 
 
 #	 for pt in pts:
@@ -123,7 +123,9 @@ def prepareTrackSurface(engine: Engine, environment: Environment) -> Engine.Surf
 	# remove the inside surface from the outside to create the track surface and apply the texture to the result
 	
 	outer_surface = (outer_surface - inner_surface).apply_texture(texture)
-	engine.renderLine(inner_edges[-2], outer_edges[-2], 15, engine.colors['white'], outer_surface)
+	starting_line_start = (inner_edges[0][0], inner_edges[0][1])
+	starting_line_end   = (outer_edges[0][0], inner_edges[0][1])
+	engine.renderLine(starting_line_start, starting_line_end, 5, engine.colors['white'], outer_surface)
 	#engine.renderLine()
 
 	# draw some boundaries
