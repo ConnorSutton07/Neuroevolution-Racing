@@ -38,7 +38,7 @@ class Racecar:
 		
 		# initial conditions are important to save when resetting for genetic training
 		self.initial_p = initial_pos if initial_pos is not None else np.array([200., 200.])  # position
-		self.initial_d = initial_direction if initial_direction is not None else np.array([1., 0.])  # direction 
+		self.initial_d = initial_direction if initial_direction is not None else np.array([0., -1.])  # direction 
 		self.initial_s = initial_speed if initial_speed is not None else 0  # speed
 		self.initial_a = initial_accel if initial_accel is not None else 0  # acceleration
 		
@@ -57,24 +57,39 @@ class Racecar:
 		self.steps = 0  # number of steps taken
 		self.alive = True
 		self.resets = 0  # num times this racecar has been reset
-		self.laps_completed = 0
-		self.c0 = 0
 		self.boost = False
 		self.boost_speed = self.max_speed * 0.5#@0.5
+
+		self.c0 = 0
+		self.p0 = 0
+		self.total_distance = 0
+		self.laps_completed = 0
 
 	def step(self, environment: Environment, inTrack: bool, c0: float) -> None:
 		"""Updates cars state."""
 		steering, throttle, boost = self.get_controls(environment)
-		
-		#print(c0)
+
 		self.boost = boost
+		self.update_distance(c0)
 		self.turn(steering)
 		self.accelerate(throttle)
-		#print("s:", round(self.s, 3), "d:", np.round(self.d, 3), "a:", round(self.a, 3))
 		self.p += self.s * self.d
 		self.s *= self.speed_decay
 		self.steps += 1
 
+	def update_distance(self, c0: float) -> None:
+		"""
+		Updates the total distance traveled
+		and the number of laps completed.
+
+		"""
+		p0 = self.p0
+		if abs(p0 - c0) > 1:
+			self.total_distance += (2 * np.pi) - abs(c0 - p0)
+		else:
+			self.total_distance += c0 - p0
+		self.p0 = c0
+		self.laps_completed = int(self.total_distance / (2 * np.pi))
 
 	def accelerate(self, throttle: float) -> None:
 		"""Sets acceleration."""
@@ -178,12 +193,13 @@ class Racecar:
 			d = -(2 * np.pi - np.arccos(d0))
 		#print(d)
 		return {
-			"pos": self.p,
-			"dir": d,
+			"pos"  : self.p,
+			"dir"  : d,
 			"speed": self.s,
 			"accel": self.a,
 			"alive": self.alive,
-			"boost": self.boost
+			"boost": self.boost,
+			"lap"  : self.laps_completed
 		}
 
 	def __eq__(self, other: Racecar) -> bool:
