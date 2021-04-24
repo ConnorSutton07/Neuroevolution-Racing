@@ -27,12 +27,13 @@ TRACK_SCALE = 1.5 * (SCREEN_SIZE[0] / 800)
 ASSET_FOLDER = os.path.join(os.getcwd(), "assets")
 IMAGE_FOLDER = os.path.join(ASSET_FOLDER, "images")
 FONT_FOLDER  = os.path.join(ASSET_FOLDER, "fonts")
-TRACK_TEXTURE = 'earth2.png'
+TRACK_TEXTURE = 'earth.png'
 FROG_CAR      = 'frog-car.png'
-BACKGROUND    = 'new_flowers-big.png'
+BACKGROUND    = 'flowers.png'
 FONT_FILE     = 'DisposableDroidBB.ttf'
 
 # PARTICLES
 PARTICLE_SIZE = 5
 NUM_PARTICLES = 3
-FIRE_COLORS = [(242, 163, 15), (242, 139, 12), (242, 73, 12), (115, 12, 2), (64, 6, 1)]
+RED_FIRE   = [(242, 163, 15), (242, 139, 12), (242, 73, 12), (115, 12, 2), (64, 6, 1)]
+GREEN_FIRE = [(125, 242, 7), (132, 217, 4), (85, 140, 3), (54, 89, 2), (13, 13, 13)]
