@@ -14,11 +14,11 @@ from copy import copy
 
 def PvAI():
 	track = Track(type=TRACK_TYPE)
-	grid_colors = ('pastelLightGreen', 'pastelYellow', 'pastelDarkGreen')
+	grid_colors = ('darkGrass', 'lightGrass', 'lightGrass')
 
 	engine = Engine(SCREEN_SIZE, 
-					numGrids = (27, 27), 
-					backgroundType = 'checkered', 
+					numGrids = (16, 16), 
+					backgroundType = 'image', 
 					backgroundPath = BACKGROUND, 
 					gridColors = grid_colors, 
 					title = "NEUROEVOLUTION RACING",
@@ -70,7 +70,7 @@ def renderCar(engine: Engine, environment: Environment, carSurface) -> None:
 	rect = carSurface.surface.get_rect()
 	
 	if car_state['boost']:
-		engine.add_particles(pos, (-np.cos(dir), np.sin(dir)), FIRE_COLORS, size=PARTICLE_SIZE, N=NUM_PARTICLES)
+		engine.add_particles(pos, (-np.cos(dir), np.sin(dir)), RED_FIRE, size=PARTICLE_SIZE, N=NUM_PARTICLES)
 	if environment.trackContains(pos):
 		engine.renderSurface(carSurface, (pos[0] - int(rect.width/2), pos[1] - int(rect.height/2)))
 	else:
@@ -110,15 +110,13 @@ def prepareTrackSurface(engine: Engine, environment: Environment) -> Engine.Surf
 	engine.renderPolygon((255, 255, 255), outer_edges, dest=outer_surface)
 	engine.renderPolygon((0, 0, 0), inner_edges, dest=inner_surface)
 
-
-
 	if engine.getBackgroundType() == 'image':
 		# load the texture that will be applied to the track
 		texture = engine.load_image(TRACK_TEXTURE)
 		texture = engine.tile_surface(texture)
 	else:
 		texture = engine.Surface(outer_surface.get_size(), flag='srcalpha')
-		texture.fill(engine.colors['pastelDarkGreen'])
+		texture.fill(engine.colors['brickRed'])
 
 	# remove the inside surface from the outside to create the track surface and apply the texture to the result
 	
