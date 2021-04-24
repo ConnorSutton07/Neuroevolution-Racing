@@ -13,13 +13,14 @@ class Racecar:
 	valid_controllers = {"ai", "player"}
 	def __init__(
 			self,
-			controller_type,  # must be in Racecar.valid_controllers
+			controller_type: str,  # must be in Racecar.valid_controllers
 			agent_id: str = "",
 			architecture: tuple = (8, 6, 2),
 			initial_pos: np.ndarray = None,
 			initial_direction: np.ndarray = None,
 			initial_speed: float = None,
 			initial_accel: float = None,
+			initial_dist: float = 0,
 			speed_decay: float = 0.9125,
 			max_turning_rate: float = np.radians(5),
 			max_speed: float = 10,
@@ -60,9 +61,9 @@ class Racecar:
 		self.boost = False
 		self.boost_speed = self.max_speed * 0.5#@0.5
 
-		self.c0 = 0
-		self.p0 = 0
-		self.total_distance = 0
+		
+		self.total_distance = initial_dist
+		self.p0 = 2 * np.pi + initial_dist
 		self.laps_completed = 0
 
 	def step(self, environment: Environment, inTrack: bool, c0: float) -> None:
@@ -85,7 +86,8 @@ class Racecar:
 		"""
 		p0 = self.p0
 		if abs(p0 - c0) > 1:
-			self.total_distance += (2 * np.pi) - abs(c0 - p0)
+			sign = -1 if p0 < c0 else 1
+			self.total_distance += ((2 * np.pi) - abs(c0 - p0)) * sign
 		else:
 			self.total_distance += c0 - p0
 		self.p0 = c0
