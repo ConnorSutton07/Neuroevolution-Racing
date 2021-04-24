@@ -9,8 +9,11 @@ import numpy as np
 class Environment:
     def __init__(self, track: Track) -> None:
         self.track = track
-        self.start_point, self.start_d = self.prepareTrack()
-        self.car = Racecar("player", initial_pos=self.start_point, initial_direction=self.start_d)
+        start_point, start_d = self.prepareTrack()
+        self.car = Racecar(controller_type = "player", 
+                           initial_pos = start_point,
+                           initial_direction = start_d,
+                           initial_dist = -self.track.getTheta(self.scale(start_point)))
 
     def step(self) -> None:
         """ 
@@ -36,17 +39,18 @@ class Environment:
         """
         inner_edges = self.track.getInnerEdges()
         outer_edges = self.track.getOuterEdges()
+
         inner_edges = list(map(lambda x: (x[0] * TRACK_SCALE + TRACK_ORIGIN[0], x[1] * TRACK_SCALE + TRACK_ORIGIN[1]), inner_edges))
         outer_edges = list(map(lambda x: (x[0] * TRACK_SCALE + TRACK_ORIGIN[0], x[1] * TRACK_SCALE + TRACK_ORIGIN[1]), outer_edges))
 
-        inner_start_point = inner_edges[0]
-        outer_start_point = outer_edges[0]
+        inner_start_point = inner_edges[2]
+        outer_start_point = outer_edges[2]
 
-        starting_point = np.array([(inner_start_point[0] + outer_start_point[0]) / 2, (inner_start_point[1] + outer_start_point[1]) / 2])
+        x = inner_edges[0][0] - inner_edges[2][0]
+        y = inner_edges[0][1] - inner_edges[2][1]
 
-        x = inner_edges[-2][0] - inner_edges[0][0]
-        y = inner_edges[-2][1] - inner_edges[0][1]
         starting_d = np.array([x / np.sqrt(x**2 + y**2), y / np.sqrt(x**2 + y**2)])
+        starting_point = np.array([(inner_start_point[0] + outer_start_point[0]) / 2, (inner_start_point[1] + outer_start_point[1]) / 2])
 
         self.track.setFinalEuclidean(np.array([inner_edges, outer_edges]))
         return starting_point, starting_d
