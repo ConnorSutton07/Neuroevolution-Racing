@@ -108,7 +108,7 @@ class Track:
         return (basic_euclidean_edges, polar_edges, euclidean_edges)
 
     def getTheta(self, pt: tuple) -> float:
-        r, theta = revert_to_polar(pt)
+        _, theta = revert_to_polar(pt)
         return theta
 
     def __contains__(self, pt: tuple) -> bool:
