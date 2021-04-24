@@ -68,20 +68,23 @@ class Engine:
 		Blits line to screen.
 	"""
 	colors = {
-		"green"			: (0, 255, 0),
-		"red"			  : (255, 0, 0),
+		"green"			   : (0, 255, 0),
+		"red"			   : (255, 0, 0),
 		"purple"		   : (200, 100, 200),
-		"blue"			 : (0, 0, 255),
+		"blue"			   : (0, 0, 255),
 		"mediumBlue"	   : (150, 150, 255),
-		"lightBlue"		: (175, 175, 255),
-		"black"			: (0, 0, 0),
-		"white"			: (255, 255, 255),
-		"brown"			: (82, 75, 36),
+		"lightBlue"		   : (175, 175, 255),
+		"black"			   : (0, 0, 0),
+		"white"			   : (255, 255, 255),
+		"brown"			   : (82, 75, 36),
 		"pastelLightGreen" : (93, 255, 163),
 		"pastelDarkGreen"  : (36, 232, 189),
-		"pastelYellow"	 : (246, 245, 155),
+		"pastelYellow"	   : (246, 245, 155),
 		"pastelBlue"	   : (193, 198, 252),
-		"pastelPink"	   : (254, 151, 218)
+		"pastelPink"	   : (254, 151, 218),
+		"darkGrass"		   : (73, 255, 130),
+		"lightGrass"       : (93, 255, 164),
+		"brickRed"		   : (213, 153, 122)
 	}
 
 	def __init__(self,
@@ -245,7 +248,7 @@ class Engine:
 			RGB color value for rect behind text
 		"""
 		if fontSize not in self.fontCache:
-			self.fontCache[fontSize] = pygame.font.SysFont(self.fontStyle, fontSize)
+			self.fontCache[fontSize] = pygame.font.Font(self.fontStyle, fontSize)
 
 		font = self.fontCache[fontSize]
 		paddedOutput = " " + text + " "
@@ -259,7 +262,7 @@ class Engine:
 		textRect.center = pos
 		self.screen.blit(text, textRect)
 
-	def renderRect(self, pos: tuple, size: tuple, fillColor: tuple, alpha: int = 255) -> None:
+	def renderRect(self, pos: tuple, size: tuple, fillColor: tuple, alpha: int = 255, dest: Engine.Surface = None) -> None:
 		"""
 		Blits rect to screen.
 		Parameters
@@ -279,9 +282,11 @@ class Engine:
 		surface = self.surfaceCache[size]
 		surface.set_alpha(alpha)
 		surface.fill(fillColor)
-		self.screen.blit(surface.surface, pos)
 
-	def renderCircle(self, pos: tuple, radius: float, fillColor: tuple, alpha: int = 255, surface: Engine.Surface = None) -> None:
+		dest_surface = self.screen if dest is None else dest.surface
+		dest_surface.blit(surface.surface, pos)
+
+	def renderCircle(self, pos: tuple, radius: float, fillColor: tuple, alpha: int = 255, dest: Engine.Surface = None) -> None:
 		"""
 		Blits circle to screen.
 		Parameters
@@ -307,9 +312,10 @@ class Engine:
 		surface.set_colorkey(Engine.colors["white"])
 		surface.set_alpha(alpha)
 		#print(pos)
-
+				
 		pygame.draw.circle(surface.surface, fillColor, (rel_x, rel_y), radius)
-		self.screen.blit(surface.surface, pos)
+		dest_surface = self.screen if dest is None else dest.surface
+		dest_surface.blit(surface.surface, pos)
 
 	def renderLine(self, start: tuple, end: tuple, width: int, fillColor: tuple, dest: Engine.Surface = None) -> None:
 		"""
@@ -325,8 +331,8 @@ class Engine:
 		fillColor: tuple
 			RGB values for color of rect
 		"""
-		surface = self.screen if dest is None else dest.surface
-		pygame.draw.line(surface, fillColor, start, end, width)
+		dest_surface = self.screen if dest is None else dest.surface
+		pygame.draw.line(dest_surface, fillColor, start, end, width)
 	
 
 	def renderPolygon(self, color: tuple, points: list, width: int = 0, dest: Engine.Surface = None) -> None:
@@ -345,8 +351,8 @@ class Engine:
 			width of poylgon edges
 		
 		"""
-		surface = self.screen if dest is None else dest.surface
-		pygame.draw.polygon(surface, color, points, width)
+		dest_surface = self.screen if dest is None else dest.surface
+		pygame.draw.polygon(dest_surface, color, points, width)
 
 
 
@@ -459,9 +465,9 @@ class Engine:
 		edges = ({0, n[0] - 1}, {0, n[1] - 1})
 		for i in range(n[0]):
 			for j in range(n[1]):
-				if border and any([(i, j)[k] in edges[k] for k in range(2)]):
-					board[(i, j)] = 2
-				elif (i + j) % 2 == 0:
+				#if border and any([(i, j)[k] in edges[k] for k in range(2)]):
+				#	board[(i, j)] = 2
+				if (i + j) % 2 == 0:
 					board[(i, j)] = 1
 				else:
 					board[(i, j)] = 0
